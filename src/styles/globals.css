@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.cdnfonts.com/css/interstate-2");
+
+html {
+  @apply font-interstate;
+}
+
+html::-webkit-scrollbar,
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+*::-webkit-scrollbar,
+::-webkit-scrollbar-track {
+  background-color: white;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+}
+*::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-black;
+}
+
+*::-webkit-scrollbar,
+::-webkit-scrollbar-track {
+  background-color: white;
+}
+
+input {
+  @apply focus-within:outline-none;
+}
