@@ -21,16 +21,16 @@ const icons: SideBarIconProps[] = [
     activeIcon: FaGem,
     unactiveIcon: FaRegGem,
   },
-  {
-    href: "/connect",
-    activeIcon: FaHandshakeSimple,
-    unactiveIcon: FaRegHandshake,
-  },
-  {
-    href: "/orders",
-    activeIcon: HiClipboardDocumentList,
-    unactiveIcon: HiOutlineClipboardDocumentList,
-  },
+  // {
+  //   href: "/connect",
+  //   activeIcon: FaHandshakeSimple,
+  //   unactiveIcon: FaRegHandshake,
+  // },
+  // {
+  //   href: "/orders",
+  //   activeIcon: HiClipboardDocumentList,
+  //   unactiveIcon: HiOutlineClipboardDocumentList,
+  // },
 ];
 
 export const Layout = ({ children }: { children: ReactNode[] | ReactNode }) => {

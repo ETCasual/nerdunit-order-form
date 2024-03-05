@@ -11,7 +11,7 @@ const Visitors = () => {
     <HomeLayout>
       <section className="flex flex-grow flex-col gap-3 px-7 pb-5 pt-3">
         <div className="flex flex-row items-center justify-between">
-          <Search icon={<FaSliders />} />
+          <Search icon={<FaSliders />} white />
           <div className="flex flex-row items-center gap-2">
             <Button label="Customers" dropdown leftIcon={IoPeopleOutline} />
             <Button label="Download" leftIcon={AiOutlineDownload} />

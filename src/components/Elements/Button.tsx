@@ -6,21 +6,29 @@ export interface ButtonProps {
   dropdown?: boolean;
   leftIcon?: IconType;
   label: string;
+  dark?: boolean;
 }
 
 export const Button: FunctionComponent<ButtonProps> = ({
   dropdown,
   leftIcon,
   label,
+  dark,
 }) => {
   return (
-    <button className="group flex flex-row items-center gap-1.5 rounded-md bg-white px-3 py-1.5 font-interstate shadow-md transition-colors duration-150 hover:bg-black">
+    <button
+      className={`group flex flex-row items-center gap-1.5 rounded-md ${dark ? "bg-black hover:bg-white" : "bg-white hover:bg-black"} px-3 py-1.5 font-interstate shadow-md transition-colors duration-150`}
+    >
       {leftIcon && (
-        <span className="group-hover:text-white">
+        <span
+          className={`${dark ? "text-white group-hover:text-black" : "text-black group-hover:text-white"}`}
+        >
           {createElement(leftIcon)}
         </span>
       )}
-      <p className="text-xs font-semibold tracking-wide group-hover:text-white">
+      <p
+        className={`text-xs font-semibold tracking-wide ${dark ? "text-white group-hover:text-black" : "text-black group-hover:text-white"}`}
+      >
         {label}
       </p>
       {dropdown && (

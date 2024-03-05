@@ -4,14 +4,18 @@ import { cloneElement, type FunctionComponent, type ReactElement } from "react";
 interface SearchProps {
   placeholder?: string;
   icon?: ReactElement;
+  white?: boolean;
 }
 
 export const Search: FunctionComponent<SearchProps> = ({
   placeholder = "Search",
   icon,
+  white,
 }) => {
   return (
-    <div className="flex flex-row items-center rounded-md bg-white">
+    <div
+      className={`flex flex-row items-center rounded-md ${white ? "bg-white" : "bg-[#f1f3f4]"}`}
+    >
       <div className="flex w-full flex-row items-center gap-2 px-2 py-1.5">
         <label htmlFor="Search">
           <FiSearch color="gray" />

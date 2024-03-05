@@ -1,0 +1,4217 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model cscart_access_restriction {
+    item_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    value     String @default("") @db.VarChar(66)
+    ip_from   Int    @default(0) @db.UnsignedInt
+    ip_to     Int    @default(0) @db.UnsignedInt
+    type      String @default("") @db.Char(3)
+    status    String @default("A") @db.Char(1)
+    timestamp Int    @default(0) @db.UnsignedInt
+    expires   Int    @default(0) @db.UnsignedInt
+
+    @@index([type], map: "type")
+}
+
+model cscart_access_restriction_block {
+    ip        Int @id @default(0) @db.UnsignedInt
+    tries     Int @default(0) @db.UnsignedSmallInt
+    timestamp Int @default(0) @db.UnsignedInt
+    expires   Int @default(0) @db.UnsignedInt
+
+    @@index([expires], map: "expires")
+    @@index([expires], map: "expires_2")
+}
+
+model cscart_access_restriction_reason_descriptions {
+    item_id   Int    @default(autoincrement()) @db.UnsignedMediumInt
+    type      String @default("") @db.Char(3)
+    reason    String @db.MediumText
+    lang_code String @default("EN") @db.Char(2)
+
+    @@id([item_id, type, lang_code])
+}
+
+model cscart_addon_descriptions {
+    addon       String @default("") @db.VarChar(32)
+    object_id   String @default("") @db.VarChar(64)
+    object_type String @default("") @db.Char(1)
+    description String @default("") @db.VarChar(255)
+    tooltip     String @db.Text
+    lang_code   String @default("") @db.VarChar(2)
+
+    @@id([addon, object_id, object_type, lang_code])
+}
+
+model cscart_addons {
+    addon        String @id @default("") @db.VarChar(32)
+    status       String @default("A") @db.Char(1)
+    options      String @db.Text
+    priority     Int    @default(0) @db.UnsignedInt
+    dependencies String @default("") @db.VarChar(255)
+
+    @@index([priority], map: "priority")
+}
+
+model cscart_aff_action_links {
+    action_id   Int    @default(0) @db.UnsignedMediumInt
+    object_data String @default("") @db.VarChar(255)
+    object_type String @default("") @db.Char(1)
+
+    @@id([action_id, object_type])
+}
+
+model cscart_aff_banner_descriptions {
+    banner_id Int    @default(0) @db.UnsignedMediumInt
+    title     String @default("") @db.VarChar(64)
+    content   String @default("") @db.VarChar(255)
+    alt       String @default("") @db.VarChar(64)
+    lang_code String @default("EN") @db.Char(2)
+
+    @@id([banner_id, lang_code])
+}
+
+model cscart_aff_banners {
+    banner_id     Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    width         Int    @default(120) @db.UnsignedInt
+    height        Int    @default(60) @db.UnsignedInt
+    type          String @default("T") @db.Char(1)
+    link_to       String @default("U") @db.Char(1)
+    data          String @default("") @db.VarChar(255)
+    show_title    String @default("Y") @db.Char(1)
+    text_location String @default("B") @db.Char(1)
+    new_window    String @default("N") @db.Char(1)
+    to_cart       String @default("N") @db.Char(1)
+    show_url      String @default("N") @db.Char(1)
+    status        String @default("A") @db.Char(1)
+
+    @@index([type, link_to], map: "type_linkto")
+}
+
+model cscart_aff_group_descriptions {
+    group_id  Int    @default(0) @db.UnsignedMediumInt
+    name      String @default("") @db.Char(64)
+    lang_code String @default("EN") @db.Char(2)
+
+    @@id([group_id, lang_code])
+}
+
+model cscart_aff_groups {
+    group_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    link_to  String @default("U") @db.Char(1)
+    data     String @default("") @db.Char(255)
+    status   String @default("A") @db.Char(1)
+
+    @@index([link_to], map: "link_to")
+}
+
+model cscart_aff_partner_actions {
+    action_id   Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    banner_id   Int     @default(0) @db.UnsignedMediumInt
+    partner_id  Int     @default(0) @db.UnsignedMediumInt
+    plan_id     Int     @default(0) @db.UnsignedMediumInt
+    customer_id Int     @default(0) @db.UnsignedMediumInt
+    date        Int     @default(0) @db.UnsignedInt
+    ip          String  @default("") @db.VarChar(255)
+    action      String  @default("") @db.VarChar(32)
+    amount      Decimal @default(0.00) @db.Decimal(12, 2)
+    approved    String  @default("N") @db.Char(1)
+    payout_id   Int     @default(0) @db.UnsignedMediumInt
+
+    @@index([action, date, amount, approved, payout_id], map: "action_date_amount_approved_payoutid")
+    @@index([amount], map: "amount")
+    @@index([approved, payout_id], map: "data_approved_payoutid")
+    @@index([partner_id, approved, date, payout_id, amount], map: "parnerid_approved_date_payoutid")
+    @@index([partner_id, date], map: "partnerid_date")
+    @@index([payout_id], map: "payout_id")
+}
+
+model cscart_aff_partner_profiles {
+    user_id             Int     @id @default(0) @db.UnsignedMediumInt
+    approved            String  @default("N") @db.Char(1)
+    plan_id             Int     @default(0) @db.UnsignedMediumInt
+    balance             Decimal @default(0.00) @db.Decimal(12, 2)
+    referrer_partner_id Int     @default(0) @db.UnsignedMediumInt
+}
+
+model cscart_affiliate_payouts {
+    payout_id  Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    partner_id Int     @default(0) @db.UnsignedMediumInt
+    amount     Decimal @default(0.00) @db.Decimal(12, 2)
+    date       Int     @default(0) @db.UnsignedInt
+    status     String  @default("O") @db.Char(1)
+}
+
+model cscart_affiliate_plans {
+    plan_id                    Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    payout_types               String  @db.Text
+    commissions                String  @default("") @db.VarChar(255)
+    min_payment                Decimal @default(0.00) @db.Decimal(12, 2)
+    product_ids                String  @db.Text
+    category_ids               String  @db.Text
+    promotion_ids              String  @db.Text
+    cookie_expiration          Int     @default(0) @db.UnsignedInt
+    method_based_selling_price String  @default("N") @db.Char(1)
+    use_coupon_commission      String  @default("N") @db.Char(1)
+    status                     String  @default("A") @db.Char(1)
+}
+
+model cscart_also_bought_products {
+    product_id Int @default(0) @db.UnsignedMediumInt
+    related_id Int @default(0) @db.UnsignedMediumInt
+    amount     Int @default(0) @db.UnsignedSmallInt
+
+    @@id([product_id, related_id])
+}
+
+model cscart_archived_orders_table {
+    order_id        Int     @id @db.UnsignedMediumInt
+    is_parent_order String  @default("N") @db.Char(1)
+    parent_order_id Int     @default(0) @db.UnsignedMediumInt
+    company_id      Int     @default(0) @db.UnsignedInt
+    user_id         Int     @default(0) @db.UnsignedMediumInt
+    total           Decimal @default(0.00) @db.Decimal(12, 2)
+    timestamp       Int     @default(0) @db.UnsignedInt
+    status          String  @default("O") @db.Char(1)
+    firstname       String  @default("") @db.VarChar(32)
+    lastname        String  @default("") @db.VarChar(32)
+    s_country       String? @db.Char(2)
+    email           String  @default("") @db.VarChar(128)
+    gift            Int?    @db.UnsignedTinyInt
+    items           Int     @default(0) @db.UnsignedSmallInt
+
+    @@index([email], map: "email")
+    @@index([gift], map: "gift")
+    @@index([parent_order_id], map: "parent_order_id")
+    @@index([status], map: "status")
+    @@index([timestamp], map: "timestamp")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_attachment_descriptions {
+    attachment_id Int    @default(0) @db.UnsignedMediumInt
+    lang_code     String @default("") @db.Char(2)
+    description   String @default("") @db.VarChar(255)
+
+    @@id([attachment_id, lang_code])
+}
+
+model cscart_attachments {
+    attachment_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    object_type   String @default("") @db.VarChar(30)
+    object_id     Int    @default(0) @db.UnsignedMediumInt
+    type          String @default("") @db.Char(1)
+    position      Int    @default(0)
+    filename      String @default("") @db.VarChar(100)
+    filesize      Int    @default(0) @db.UnsignedInt
+    usergroup_ids String @default("0") @db.VarChar(255)
+    status        String @default("A") @db.Char(1)
+
+    @@index([object_type, object_id], map: "object_type")
+    @@index([type], map: "type")
+}
+
+model cscart_banner_descriptions {
+    banner_id   Int    @default(0) @db.UnsignedMediumInt
+    banner      String @default("") @db.VarChar(255)
+    description String @db.MediumText
+    lang_code   String @default("EN") @db.Char(2)
+
+    @@id([banner_id, lang_code])
+}
+
+model cscart_banners {
+    banner_id    Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    url          String @default("") @db.VarChar(255)
+    status       String @default("A") @db.Char(1)
+    type         String @default("G") @db.Char(1)
+    target       String @default("B") @db.Char(1)
+    localization String @default("") @db.VarChar(255)
+    timestamp    Int    @default(0) @db.UnsignedInt
+
+    @@index([localization], map: "localization")
+    @@index([status], map: "status")
+}
+
+model cscart_barcode_status_description {
+    status             Int    @unique(map: "status") @db.UnsignedTinyInt
+    description        String @db.VarChar(50)
+    detail_description String @db.VarChar(50)
+    color              String @default("#000") @db.VarChar(8)
+}
+
+model cscart_bdaylove {
+    user_id   Int @id @db.MediumInt
+    birthdate Int
+}
+
+model cscart_block_descriptions {
+    block_id       Int    @default(0) @db.UnsignedMediumInt
+    object_id      Int    @default(0) @db.UnsignedMediumInt
+    object_type    String @default("B") @db.Char(1)
+    object_text_id String @default("") @db.VarChar(32)
+    description    String @db.MediumText
+    lang_code      String @default("EN") @db.VarChar(2)
+
+    @@id([block_id, object_id, object_type, lang_code])
+}
+
+model cscart_block_links {
+    link_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    block_id  Int    @default(0) @db.UnsignedMediumInt
+    location  String @default("") @db.VarChar(32)
+    object_id Int    @default(0) @db.UnsignedInt
+    item_ids  String @db.Text
+    enable    String @default("Y") @db.Char(1)
+
+    @@unique([block_id, object_id], map: "block_id")
+    @@index([block_id, enable], map: "block_id_2")
+    @@index([location, enable], map: "loc")
+}
+
+model cscart_block_location_descriptions {
+    location    String @default("") @db.VarChar(32)
+    property    String @default("") @db.VarChar(32)
+    description String @db.MediumText
+    lang_code   String @default("EN") @db.VarChar(2)
+
+    @@id([location, property, lang_code])
+}
+
+model cscart_block_location_properties {
+    location String @default("") @db.VarChar(32)
+    property String @default("") @db.VarChar(32)
+    value    String @default("") @db.VarChar(255)
+
+    @@id([location, property])
+}
+
+model cscart_block_positions {
+    block_id  Int    @default(0) @db.UnsignedMediumInt
+    text_id   String @default("") @db.VarChar(32)
+    object_id Int    @default(0) @db.UnsignedMediumInt
+    location  String @default("") @db.VarChar(32)
+    group_id  Int    @default(0) @db.UnsignedMediumInt
+    position  Int    @default(0) @db.UnsignedSmallInt
+
+    @@id([block_id, text_id, object_id, location, group_id])
+    @@index([object_id], map: "object_id")
+}
+
+model cscart_blocks {
+    block_id           Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    text_id            String @default("") @db.VarChar(32)
+    block_type         String @default("B") @db.Char(1)
+    location           String @default("") @db.VarChar(32)
+    disabled_locations String @default("") @db.VarChar(255)
+    status             String @default("A") @db.Char(1)
+    properties         String @db.Text
+    company_id         Int?   @db.UnsignedInt
+
+    @@index([disabled_locations], map: "disabled_locations")
+    @@index([status, location], map: "sloc")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_campaign_first_customers {
+    email        String @id @db.VarChar(128)
+    user_id      Int    @default(0) @db.UnsignedMediumInt
+    timestamp    Int    @db.UnsignedInt
+    status       Int    @default(0) @db.UnsignedTinyInt
+    mail1        Int    @default(0) @db.UnsignedTinyInt
+    mail2        Int    @default(0) @db.UnsignedTinyInt
+    order_id_ori Int    @db.UnsignedMediumInt
+    order_id     Int?   @db.UnsignedMediumInt
+
+    @@index([mail1, mail2, status], map: "mail1")
+}
+
+model cscart_categories {
+    category_id             Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    parent_id               Int    @default(0) @db.UnsignedMediumInt
+    id_path                 String @default("") @db.VarChar(255)
+    owner_id                Int    @default(0) @db.UnsignedMediumInt
+    usergroup_ids           String @default("0") @db.VarChar(255)
+    status                  String @default("A") @db.Char(1)
+    product_count           Int    @default(0) @db.UnsignedMediumInt
+    position                Int    @default(0) @db.UnsignedSmallInt
+    timestamp               Int    @default(0) @db.UnsignedInt
+    is_op                   String @default("N") @db.Char(1)
+    localization            String @default("") @db.VarChar(255)
+    age_verification        String @default("N") @db.Char(1)
+    age_limit               Int    @default(0) @db.TinyInt
+    parent_age_verification String @default("N") @db.Char(1)
+    parent_age_limit        Int    @default(0) @db.TinyInt
+    selected_layouts        String @db.Text
+    default_layout          String @default("") @db.VarChar(50)
+    product_details_layout  String @default("") @db.VarChar(50)
+    product_columns         Int    @default(0) @db.UnsignedTinyInt
+    mobileSliderTemplate    Int    @default(1)
+
+    @@index([age_verification, age_limit], map: "age_verification")
+    @@index([usergroup_ids, status, parent_id], map: "c_status")
+    @@index([id_path], map: "id_path")
+    @@index([localization], map: "localization")
+    @@index([category_id, usergroup_ids, status], map: "p_category_id")
+    @@index([parent_id], map: "parent")
+    @@index([parent_age_verification, parent_age_limit], map: "parent_age_verification")
+    @@index([position], map: "position")
+}
+
+model cscart_category_descriptions {
+    category_id         Int    @default(0) @db.UnsignedMediumInt
+    lang_code           String @default("EN") @db.Char(2)
+    category            String @default("") @db.VarChar(255)
+    description         String @db.MediumText
+    meta_keywords       String @default("") @db.VarChar(255)
+    meta_description    String @default("") @db.VarChar(255)
+    page_title          String @default("") @db.VarChar(255)
+    age_warning_message String @db.Text
+
+    @@id([category_id, lang_code])
+}
+
+model cscart_common_descriptions {
+    object_id     Int    @default(0) @db.UnsignedMediumInt
+    object_type   String @default("") @db.VarChar(32)
+    description   String @db.MediumText
+    lang_code     String @default("EN") @db.Char(2)
+    object        String @default("") @db.VarChar(128)
+    object_holder String @default("") @db.VarChar(32)
+
+    @@id([object_id, lang_code, object_holder])
+}
+
+model cscart_companies {
+    company_id           Int     @id @default(autoincrement()) @db.UnsignedInt
+    status               String  @default("A") @db.Char(1)
+    company              String  @db.VarChar(255)
+    lang_code            String  @default("EN") @db.Char(2)
+    address              String  @db.VarChar(255)
+    city                 String  @db.VarChar(64)
+    state                String  @db.VarChar(32)
+    country              String  @db.Char(2)
+    zipcode              String  @db.VarChar(16)
+    email                String  @db.VarChar(128)
+    phone                String  @db.VarChar(32)
+    fax                  String  @db.VarChar(32)
+    url                  String  @db.VarChar(128)
+    timestamp            Int
+    categories           String  @db.Text
+    shippings            String  @db.Text
+    logos                String  @db.Text
+    commission           Decimal @default(0.00) @db.Decimal(12, 2)
+    commission_type      String  @default("A") @db.Char(1)
+    request_user_id      Int     @default(0) @db.UnsignedMediumInt
+    request_account_name String  @default("") @db.VarChar(255)
+    request_account_data String  @db.Text
+}
+
+model cscart_company_descriptions {
+    company_id          Int    @db.UnsignedInt
+    lang_code           String @db.Char(2)
+    company_description String @db.Text
+
+    @@id([company_id, lang_code])
+}
+
+model cscart_conf_class_descriptions {
+    class_id   Int    @default(0) @db.UnsignedMediumInt
+    lang_code  String @default("EN") @db.Char(2)
+    class_name String @default("") @db.VarChar(255)
+
+    @@id([class_id, lang_code])
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_conf_class_products {
+    class_id   Int @default(0) @db.UnsignedMediumInt
+    product_id Int @default(0) @db.UnsignedMediumInt
+
+    @@index([class_id, product_id], map: "class_id")
+    @@index([product_id], map: "product_id")
+    @@ignore
+}
+
+model cscart_conf_classes {
+    class_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    status   String @default("A") @db.Char(1)
+    group_id Int    @default(0) @db.UnsignedMediumInt
+
+    @@index([group_id], map: "group_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_conf_compatible_classes {
+    master_class_id Int @default(0) @db.UnsignedMediumInt
+    slave_class_id  Int @default(0) @db.UnsignedMediumInt
+
+    @@index([master_class_id, slave_class_id], map: "master_class_id")
+    @@index([slave_class_id], map: "slave_class_id")
+    @@ignore
+}
+
+model cscart_conf_group_descriptions {
+    group_id                Int    @default(0) @db.UnsignedMediumInt
+    lang_code               String @default("EN") @db.Char(2)
+    configurator_group_name String @default("") @db.VarChar(255)
+    full_description        String @db.MediumText
+
+    @@id([group_id, lang_code])
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_conf_group_products {
+    group_id   Int @default(0) @db.UnsignedMediumInt
+    product_id Int @default(0) @db.UnsignedMediumInt
+
+    @@index([group_id, product_id], map: "group_id")
+    @@index([product_id], map: "product_id")
+    @@ignore
+}
+
+model cscart_conf_groups {
+    group_id                Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    configurator_group_type String @default("S") @db.Char(1)
+    status                  String @default("A") @db.Char(1)
+    step_id                 Int    @default(0) @db.UnsignedMediumInt
+
+    @@index([step_id], map: "step_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_conf_product_groups {
+    product_id          Int    @default(0) @db.UnsignedMediumInt
+    group_id            Int    @default(0) @db.UnsignedMediumInt
+    default_product_ids String @db.Text
+    position            Int    @default(0) @db.UnsignedSmallInt
+    required            String @default("N") @db.Char(1)
+
+    @@index([group_id, product_id, required], map: "group_id")
+    @@index([product_id], map: "product_id")
+    @@ignore
+}
+
+model cscart_conf_step_descriptions {
+    step_id   Int    @default(0) @db.UnsignedMediumInt
+    lang_code String @default("EN") @db.Char(2)
+    step_name String @default("") @db.VarChar(255)
+
+    @@id([step_id, lang_code])
+}
+
+model cscart_conf_steps {
+    step_id  Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    position Int    @default(0) @db.UnsignedSmallInt
+    status   String @default("A") @db.Char(1)
+}
+
+model cscart_countries {
+    code    String @id @default("") @db.Char(2)
+    code_A3 String @default("") @db.Char(3)
+    code_N3 Int    @default(0)
+    region  String @default("") @db.Char(2)
+    lat     Float  @default(0) @db.Float
+    lon     Float  @default(0) @db.Float
+    status  String @default("A") @db.Char(1)
+
+    @@index([status], map: "status")
+}
+
+model cscart_country_descriptions {
+    code      String @default("") @db.Char(2)
+    lang_code String @default("EN") @db.Char(2)
+    country   String @default("") @db.VarChar(128)
+
+    @@id([code, lang_code])
+}
+
+model cscart_currencies {
+    currency_code       String @id @default("") @db.VarChar(10)
+    after               String @default("N") @db.Char(1)
+    symbol              String @default("") @db.VarChar(30)
+    coefficient         Float  @default(1.00000) @db.Float
+    coefficient_real    Float  @default(1.00000) @db.Float
+    is_primary          String @default("N") @db.Char(1)
+    position            Int    @db.SmallInt
+    decimals_separator  String @default(".") @db.Char(1)
+    thousands_separator String @default(",") @db.Char(1)
+    decimals            Int    @default(2) @db.SmallInt
+    status              String @default("A") @db.Char(1)
+}
+
+model cscart_currency_descriptions {
+    currency_code String @default("") @db.VarChar(10)
+    description   String @default("") @db.VarChar(255)
+    lang_code     String @default("EN") @db.Char(2)
+
+    @@id([currency_code, lang_code])
+}
+
+model cscart_desa_draw_order_details {
+    item_id    Int      @default(0) @db.UnsignedInt
+    order_id   Int      @default(0) @db.UnsignedMediumInt
+    product_id Int      @default(0) @db.UnsignedMediumInt
+    option_id  Int      @default(0) @db.UnsignedMediumInt
+    option     Int?     @db.UnsignedMediumInt
+    date       DateTime @db.DateTime(0)
+
+    @@id([item_id, order_id, option_id])
+}
+
+model cscart_destination_descriptions {
+    destination_id Int    @default(0) @db.UnsignedMediumInt
+    lang_code      String @default("EN") @db.Char(2)
+    destination    String @default("") @db.VarChar(255)
+
+    @@id([destination_id, lang_code])
+}
+
+model cscart_destination_elements {
+    element_id     Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    destination_id Int    @default(0) @db.UnsignedMediumInt
+    element        String @default("") @db.VarChar(36)
+    element_type   String @default("S") @db.Char(1)
+
+    @@index([destination_id], map: "c_status")
+}
+
+model cscart_destinations {
+    destination_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    localization   String @default("") @db.VarChar(255)
+    status         String @default("A") @db.Char(1)
+
+    @@index([destination_id, status], map: "c_status")
+    @@index([localization], map: "localization")
+}
+
+model cscart_discussion {
+    thread_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    object_id   Int    @default(0) @db.UnsignedMediumInt
+    object_type String @default("") @db.Char(1)
+    type        String @default("D") @db.Char(1)
+
+    @@unique([object_id, object_type], map: "object_id")
+}
+
+model cscart_discussion_messages {
+    message   String @db.MediumText
+    post_id   Int    @id @default(0) @db.UnsignedMediumInt
+    thread_id Int    @default(0) @db.UnsignedMediumInt
+
+    @@index([thread_id], map: "thread_id")
+}
+
+model cscart_discussion_posts {
+    post_id    Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    thread_id  Int    @default(0) @db.UnsignedMediumInt
+    name       String @default("") @db.VarChar(128)
+    timestamp  Int    @default(0) @db.UnsignedInt
+    user_id    Int    @default(0) @db.UnsignedMediumInt
+    ip_address String @default("") @db.VarChar(15)
+    status     String @default("D") @db.Char(1)
+
+    @@index([thread_id, ip_address], map: "thread_id")
+    @@index([thread_id, status], map: "thread_id_2")
+}
+
+model cscart_discussion_rating {
+    rating_value Int @default(0) @db.UnsignedTinyInt
+    post_id      Int @id @default(0) @db.UnsignedMediumInt
+    thread_id    Int @default(0) @db.UnsignedMediumInt
+
+    @@index([thread_id], map: "thread_id")
+}
+
+model cscart_ekeys {
+    object_id     Int    @default(0) @db.UnsignedMediumInt
+    object_string String @default("") @db.VarChar(128)
+    object_type   String @default("R") @db.Char(1)
+    ekey          String @default("") @db.VarChar(32)
+    ttl           Int    @default(0) @db.UnsignedInt
+
+    @@id([object_id, object_type, ekey])
+    @@unique([object_string, object_type, ekey], map: "object_string")
+    @@index([ekey, object_type, ttl], map: "c_status")
+    @@index([ttl], map: "ttl")
+}
+
+model cscart_exim_layouts {
+    layout_id  Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    name       String @default("") @db.VarChar(128)
+    cols       String @db.Text
+    pattern_id String @default("") @db.VarChar(128)
+    active     String @default("N") @db.Char(1)
+
+    @@index([pattern_id], map: "pattern_id")
+}
+
+model cscart_ez_common_config {
+    addon            String @id @db.VarChar(32)
+    cur_ver          String @db.VarChar(32)
+    depends_on       String @db.VarChar(32)
+    min_cart_version String @db.VarChar(32)
+    max_cart_version String @db.VarChar(32)
+    next_upgrade     Int
+    has_changelog    String @db.Char(1)
+    installed        String @db.Char(1)
+    addon_data       String @db.Text
+}
+
+model cscart_form_descriptions {
+    object_id   Int    @default(0) @db.UnsignedMediumInt
+    description String @db.Text
+    lang_code   String @default("EN") @db.Char(2)
+
+    @@id([object_id, lang_code])
+}
+
+model cscart_form_options {
+    element_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    page_id      Int    @default(0) @db.UnsignedMediumInt
+    parent_id    Int    @default(0) @db.UnsignedMediumInt
+    element_type String @default("I") @db.Char(1)
+    value        String @default("") @db.VarChar(255)
+    position     Int    @default(0) @db.UnsignedSmallInt
+    required     String @default("N") @db.Char(1)
+    status       String @default("A") @db.Char(1)
+
+    @@index([page_id, status], map: "page_id")
+    @@index([position], map: "position")
+}
+
+model cscart_gift_certificates {
+    gift_cert_id   Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    gift_cert_code String  @default("") @db.VarChar(255)
+    sender         String  @default("") @db.VarChar(64)
+    recipient      String  @default("") @db.VarChar(64)
+    send_via       String  @default("E") @db.Char(1)
+    amount_type    String  @default("I") @db.Char(1)
+    amount         Decimal @default(0.00) @db.Decimal(12, 2)
+    email          String  @default("") @db.VarChar(64)
+    address        String  @default("") @db.VarChar(255)
+    address_2      String  @default("") @db.VarChar(255)
+    city           String  @default("") @db.VarChar(255)
+    state          String  @default("") @db.VarChar(32)
+    country        String  @default("") @db.Char(2)
+    zipcode        String  @default("") @db.VarChar(10)
+    status         String  @default("P") @db.Char(1)
+    timestamp      Int     @default(0) @db.UnsignedInt
+    phone          String  @default("") @db.VarChar(32)
+    order_ids      String  @default("") @db.VarChar(255)
+    template       String  @default("") @db.VarChar(128)
+    message        String  @db.MediumText
+    products       String  @db.Text
+
+    @@index([status], map: "status")
+    @@index([timestamp], map: "timestamp")
+}
+
+model cscart_gift_certificates_log {
+    log_id         Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    gift_cert_id   Int     @default(0) @db.UnsignedMediumInt
+    area           String  @default("C") @db.Char(1)
+    user_id        Int     @default(0) @db.UnsignedMediumInt
+    order_id       Int     @default(0) @db.UnsignedMediumInt
+    timestamp      Int     @default(0) @db.UnsignedInt
+    amount         Decimal @default(0.00) @db.Decimal(12, 2)
+    debit          Decimal @default(0.00) @db.Decimal(12, 2)
+    products       String  @db.Text
+    debit_products String  @db.Text
+
+    @@index([area], map: "area")
+    @@index([order_id], map: "order_id")
+    @@index([timestamp], map: "timestamp")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_giftreg_descriptions {
+    object_id   Int    @default(0) @db.UnsignedMediumInt
+    description String @default("") @db.VarChar(255)
+    object_type String @default("F") @db.Char(1)
+    lang_code   String @default("EN") @db.Char(2)
+
+    @@id([object_id, object_type, lang_code])
+}
+
+model cscart_giftreg_event_fields {
+    event_id Int    @default(0) @db.UnsignedMediumInt
+    field_id Int    @default(0) @db.UnsignedMediumInt
+    value    String @db.Text
+
+    @@id([event_id, field_id])
+}
+
+model cscart_giftreg_event_products {
+    item_id        Int     @default(0) @db.UnsignedInt
+    event_id       Int     @default(0) @db.UnsignedMediumInt
+    product_id     Int     @default(0) @db.UnsignedMediumInt
+    amount         Int     @default(0) @db.UnsignedSmallInt
+    ordered_amount Int     @default(0) @db.UnsignedSmallInt
+    extra          String? @db.Text
+
+    @@id([item_id, event_id])
+}
+
+model cscart_giftreg_event_subscribers {
+    event_id Int    @default(0) @db.UnsignedMediumInt
+    name     String @default("") @db.VarChar(128)
+    email    String @default("") @db.VarChar(64)
+
+    @@id([event_id, email])
+}
+
+model cscart_giftreg_events {
+    event_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    user_id    Int    @default(0) @db.UnsignedMediumInt
+    start_date Int    @default(0) @db.UnsignedInt
+    end_date   Int    @default(0) @db.UnsignedInt
+    status     String @default("A") @db.Char(1)
+    type       String @default("P") @db.Char(1)
+    title      String @default("") @db.VarChar(255)
+    owner      String @default("") @db.VarChar(128)
+    email      String @default("") @db.VarChar(64)
+
+    @@index([start_date, end_date, type], map: "start_date")
+}
+
+model cscart_giftreg_field_variants {
+    variant_id Int @id @default(autoincrement()) @db.UnsignedMediumInt
+    field_id   Int @default(0) @db.UnsignedMediumInt
+    position   Int @default(0) @db.UnsignedSmallInt
+
+    @@index([field_id], map: "field_id")
+    @@index([position], map: "position")
+}
+
+model cscart_giftreg_fields {
+    field_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    field_type String @default("I") @db.Char(1)
+    position   Int    @default(0) @db.UnsignedSmallInt
+    required   String @default("N") @db.Char(1)
+    status     String @default("A") @db.Char(1)
+
+    @@index([position], map: "position")
+}
+
+model cscart_ig_feed {
+    post_id          BigInt @unique(map: "post_id") @db.UnsignedBigInt
+    product_id       Int    @default(0) @db.UnsignedMediumInt
+    related_products String @db.Text
+    caption          String @db.Text
+    media_type       Int    @db.UnsignedTinyInt
+    extra            String @db.VarChar(255)
+    post_url         String @db.VarChar(255)
+    status           Int    @default(2) @db.UnsignedTinyInt
+    timestamp        Int    @db.UnsignedInt
+}
+
+model cscart_images {
+    image_id   Int    @id @default(autoincrement()) @db.MediumInt
+    image_path String @default("") @db.VarChar(255)
+    image_x    Int    @default(0)
+    image_y    Int    @default(0)
+}
+
+model cscart_images_links {
+    pair_id     Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    object_id   Int    @default(0) @db.UnsignedInt
+    object_type String @default("") @db.VarChar(24)
+    image_id    Int    @default(0) @db.UnsignedMediumInt
+    detailed_id Int    @default(0) @db.UnsignedMediumInt
+    type        String @default("M") @db.Char(1)
+    rollover    Int    @default(0) @db.UnsignedTinyInt
+    position    Int    @default(0) @db.UnsignedSmallInt
+
+    @@index([object_id, object_type, type], map: "object_id")
+}
+
+model cscart_jr_sms {
+    id_sms Int    @id @default(autoincrement()) @db.UnsignedSmallInt
+    name   String @db.VarChar(50)
+    body   String @db.VarChar(500)
+
+    @@index([id_sms], map: "id_sms")
+}
+
+model cscart_language_values {
+    lang_code String @default("EN") @db.Char(2)
+    name      String @default("") @db.VarChar(128)
+    value     String @db.Text
+
+    @@id([lang_code, name])
+}
+
+model cscart_languages {
+    lang_code String @id @default("EN") @db.Char(2)
+    name      String @default("") @db.VarChar(64)
+    status    String @default("A") @db.Char(1)
+}
+
+model cscart_lh_left_messages {
+    message_id  Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    date        Int    @default(0)
+    reply_date  Int    @default(0)
+    from_name   String @default("") @db.VarChar(255)
+    from_mail   String @default("") @db.VarChar(64)
+    subject     String @default("") @db.VarChar(255)
+    message     String @db.MediumText
+    operator_id Int    @default(0) @db.SmallInt
+    reply       String @db.Text
+    replied     Int    @default(0) @db.UnsignedTinyInt
+}
+
+model cscart_lh_messages {
+    message_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    date       Int    @default(0)
+    direction  Int    @default(0) @db.UnsignedTinyInt
+    from_id    String @default("0") @db.VarChar(255)
+    to_id      Int    @default(0) @db.UnsignedMediumInt
+    text       String @db.MediumText
+
+    @@index([direction], map: "direction")
+    @@index([from_id], map: "from_id")
+    @@index([to_id], map: "to_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_lh_messages_map {
+    self_id      Int @default(0) @db.UnsignedMediumInt
+    to_id        Int @default(0) @db.UnsignedMediumInt
+    new_messages Int @default(0) @db.UnsignedMediumInt
+    last_message Int @default(0) @db.UnsignedMediumInt
+    direction    Int @default(0) @db.UnsignedSmallInt
+
+    @@index([self_id], map: "self_id")
+    @@index([to_id], map: "to_id")
+    @@ignore
+}
+
+model cscart_lh_operators {
+    operator_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    name          String @default("") @db.VarChar(255)
+    login         String @default("") @db.VarChar(255)
+    password      String @default("") @db.VarChar(255)
+    obsolete_time Int    @default(0) @db.UnsignedInt
+    status        String @default("A") @db.Char(1)
+    register_time Int    @default(0) @db.UnsignedInt
+    type_notify   String @default("N") @db.Char(1)
+    last_message  Int    @default(0) @db.UnsignedMediumInt
+
+    @@index([obsolete_time], map: "obsolete_time")
+}
+
+model cscart_lh_sessions {
+    session_id    Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    name          String @default("") @db.VarChar(255)
+    ip            Float  @default(0)
+    time_diff     BigInt @default(0) @db.UnsignedBigInt
+    start_time    Int    @default(0) @db.UnsignedInt
+    obsolete_time Int    @default(0) @db.UnsignedInt
+    last_message  Int    @default(0) @db.UnsignedMediumInt
+    readdress     String @default("0") @db.VarChar(100)
+    chat_counter  Int    @default(0) @db.UnsignedSmallInt
+
+    @@index([ip], map: "ip")
+    @@index([obsolete_time], map: "obsolete_time")
+}
+
+model cscart_lh_stickers {
+    sticker_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    date       Int    @db.UnsignedInt
+    name       String @db.VarChar(255)
+    sticker    String @db.VarChar(255)
+    text       String @db.MediumText
+    viewed     String @db.VarChar(255)
+    closed     String @default("N") @db.Char(1)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_lh_track {
+    user_id    Int    @default(0) @db.UnsignedMediumInt
+    user_type  String @db.Char(1)
+    avail      String @default("S") @db.Char(1)
+    track      String @db.Text
+    chat_track String @db.Text
+
+    @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_lh_type_notify {
+    direction Int @default(0) @db.UnsignedSmallInt
+    self_id   Int @default(0) @db.UnsignedMediumInt
+    to_id     Int @default(0) @db.UnsignedMediumInt
+    flag      Int @default(0) @db.UnsignedSmallInt
+
+    @@index([self_id], map: "self_id")
+    @@index([to_id], map: "to_id")
+    @@index([direction], map: "type")
+    @@ignore
+}
+
+model cscart_lh_visitors {
+    visitor_id         Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    ip                 Float  @default(0)
+    start_time         Int    @default(0) @db.UnsignedInt
+    obsolete_time      Int    @default(0) @db.UnsignedInt
+    obsolete_time_chat Int    @default(0) @db.UnsignedInt
+    status             Int    @default(0) @db.UnsignedSmallInt
+    operator_id        Int    @default(0) @db.MediumInt
+    assigned_name      String @default("") @db.VarChar(255)
+    chat_counter       Int    @default(0) @db.UnsignedSmallInt
+    last_message       Int    @default(0) @db.UnsignedMediumInt
+    type_notify        String @default("N") @db.Char(1)
+    stat_track         String @default("N") @db.Char(1)
+
+    @@index([ip], map: "ip")
+    @@index([obsolete_time], map: "obsolete_time")
+}
+
+model cscart_lh_visitors_log {
+    log_id        Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    visitor_id    Int    @default(0) @db.UnsignedMediumInt
+    date          Int    @default(0) @db.UnsignedInt
+    event         Int    @default(0) @db.UnsignedSmallInt
+    operator_id   Int    @default(0) @db.UnsignedMediumInt
+    operator_name String @default("") @db.VarChar(255)
+
+    @@index([visitor_id], map: "visitor_id")
+}
+
+model cscart_lh_visitors_notes {
+    note_id       Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    visitor_id    Int    @default(0) @db.UnsignedMediumInt
+    date          Int    @default(0) @db.UnsignedInt
+    operator_id   Int    @default(0) @db.UnsignedMediumInt
+    note          String @db.Text
+    operator_name String @default("") @db.VarChar(255)
+
+    @@index([visitor_id], map: "visitor_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_localization_descriptions {
+    localization_id Int    @default(0) @db.UnsignedMediumInt
+    localization    String @default("") @db.VarChar(255)
+    lang_code       String @default("EN") @db.Char(2)
+
+    @@index([localization_id, lang_code], map: "localisation_id")
+    @@ignore
+}
+
+model cscart_localization_elements {
+    element_id      Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    localization_id Int    @default(0) @db.UnsignedMediumInt
+    element         String @default("") @db.VarChar(36)
+    element_type    String @default("S") @db.Char(1)
+    position        Int    @default(0) @db.SmallInt
+
+    @@index([localization_id], map: "c_avail")
+    @@index([element, element_type], map: "element")
+    @@index([position], map: "position")
+}
+
+model cscart_localizations {
+    localization_id        Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    custom_weight_settings String  @default("Y") @db.Char(1)
+    weight_symbol          String  @default("") @db.VarChar(255)
+    weight_unit            Decimal @default(0.00) @db.Decimal(12, 2)
+    is_default             String  @default("N") @db.Char(1)
+    status                 String  @default("A") @db.Char(1)
+}
+
+model cscart_logs {
+    log_id     Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    user_id    Int    @default(0) @db.UnsignedMediumInt
+    timestamp  Int    @default(0) @db.UnsignedInt
+    type       String @default("") @db.VarChar(16)
+    event_type String @default("N") @db.Char(1)
+    action     String @default("") @db.VarChar(16)
+    object     String @default("") @db.Char(1)
+    content    String @db.Text
+    backtrace  String @db.Text
+
+    @@index([object], map: "object")
+    @@index([type, action], map: "type")
+}
+
+model cscart_logs_orders {
+    id       Int      @id @default(autoincrement()) @db.UnsignedMediumInt
+    order_id Int      @db.UnsignedMediumInt
+    status   String   @db.Char(1)
+    date     DateTime @default(now()) @db.Timestamp(0)
+
+    @@index([order_id], map: "order_id")
+}
+
+model cscart_mail_log {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    address   String? @db.VarChar(500)
+    subject   String? @db.VarChar(500)
+    result    String? @db.VarChar(100)
+    errorinfo String? @db.VarChar(500)
+    timestamp Int?    @db.UnsignedInt
+}
+
+model cscart_mailing_lists {
+    list_id                Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    timestamp              Int    @default(0) @db.UnsignedInt
+    from_email             String @default("") @db.VarChar(64)
+    from_name              String @default("") @db.VarChar(128)
+    reply_to               String @default("") @db.VarChar(64)
+    show_on_checkout       Int    @default(0) @db.UnsignedTinyInt
+    show_on_registration   Int    @default(0) @db.UnsignedTinyInt
+    show_on_sidebar        Int    @default(0) @db.UnsignedTinyInt
+    status                 String @default("D") @db.Char(1)
+    register_autoresponder Int    @default(0) @db.UnsignedMediumInt
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_mailing_related_prod {
+    id           Int     @default(autoincrement()) @db.UnsignedInt
+    firstname    String? @db.VarChar(128)
+    lastname     String? @db.VarChar(128)
+    email        String  @db.VarChar(128)
+    product_id   Int     @db.UnsignedInt
+    product_code String  @db.VarChar(32)
+    product_name String? @db.VarChar(255)
+    lang_code    String? @db.Char(2)
+    image_id     Int?    @db.UnsignedInt
+    image_name   String? @db.VarChar(255)
+    mail_error   String? @db.VarChar(255)
+    status       Boolean
+
+    @@index([id], map: "id")
+    @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_mailing_related_prod_data {
+    id_mailing         Int     @db.UnsignedInt
+    related_product_id Int     @db.UnsignedInt
+    related_product    String? @db.VarChar(255)
+    image_id           Int?    @db.UnsignedInt
+    image_name         String? @db.VarChar(255)
+
+    @@ignore
+}
+
+model cscart_menus {
+    menu_item_id Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    menu_id      String  @db.VarChar(10)
+    desc         String  @db.VarChar(100)
+    is_title     String? @db.Char(1)
+    parent_id    Int     @default(0) @db.UnsignedMediumInt
+    url          String? @db.VarChar(255)
+    target       String? @db.VarChar(30)
+    order        Int?    @db.UnsignedTinyInt
+    content      String? @db.MediumText
+    status       String  @default("A") @db.Char(1)
+    lang_code    String  @default("EN") @db.Char(2)
+
+    @@index([menu_id, status, lang_code], map: "menu_id")
+}
+
+model cscart_new_orders {
+    order_id Int @default(0) @db.UnsignedMediumInt
+    user_id  Int @default(0) @db.UnsignedMediumInt
+
+    @@id([order_id, user_id])
+}
+
+model cscart_news {
+    news_id      Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    date         Int    @default(0) @db.UnsignedInt
+    separate     String @default("N") @db.Char(1)
+    status       String @default("D") @db.Char(1)
+    localization String @default("") @db.VarChar(255)
+
+    @@index([localization], map: "localization")
+    @@index([status], map: "status")
+}
+
+model cscart_news_descriptions {
+    news_id     Int    @default(0) @db.UnsignedMediumInt
+    news        String @default("") @db.VarChar(128)
+    description String @db.MediumText
+    lang_code   String @default("EN") @db.Char(2)
+
+    @@id([news_id, lang_code])
+}
+
+model cscart_newsletter_campaigns {
+    campaign_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    timestamp   Int    @default(0) @db.UnsignedInt
+    status      String @default("D") @db.Char(1)
+}
+
+model cscart_newsletter_descriptions {
+    newsletter_id       Int    @default(0) @db.UnsignedMediumInt
+    newsletter          String @default("") @db.VarChar(255)
+    newsletter_multiple String @db.Text
+    body_html           String @db.MediumText
+    body_txt            String @db.MediumText
+    lang_code           String @default("EN") @db.Char(2)
+
+    @@id([newsletter_id, lang_code])
+}
+
+model cscart_newsletter_links {
+    link_id       Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    campaign_id   Int    @db.UnsignedMediumInt
+    newsletter_id Int    @db.UnsignedMediumInt
+    url           String @default("") @db.VarChar(255)
+    clicks        Int?   @db.UnsignedMediumInt
+}
+
+model cscart_newsletters {
+    newsletter_id  Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    campaign_id    Int    @default(0) @db.UnsignedMediumInt
+    sent_date      Int    @default(0) @db.UnsignedInt
+    status         String @default("A") @db.Char(1)
+    type           String @default("N") @db.Char(1)
+    mailing_lists  String @default("") @db.VarChar(255)
+    users          String @db.Text
+    abandoned_type String @default("both") @db.VarChar(10)
+    abandoned_days Int    @default(0)
+}
+
+model cscart_old_order_data {
+    order_id Int    @default(0) @db.UnsignedMediumInt
+    type     String @default("") @db.Char(1)
+    data     String @db.Text
+
+    @@id([order_id, type])
+}
+
+model cscart_old_order_details {
+    item_id      Int     @default(0) @db.UnsignedInt
+    order_id     Int     @default(0) @db.UnsignedMediumInt
+    product_id   Int     @default(0) @db.UnsignedMediumInt
+    product_code String  @default("") @db.VarChar(32)
+    price        Decimal @default(0.00) @db.Decimal(12, 2)
+    price_real   Decimal @default(0.00) @db.Decimal(12, 2)
+    amount       Int     @default(0) @db.UnsignedSmallInt
+    extra        String  @db.Text
+    uk_shipping  String  @default("N") @db.Char(1)
+    us_shipping  String  @default("N") @db.Char(1)
+
+    @@id([item_id, order_id])
+    @@index([order_id, product_id], map: "o_k")
+    @@index([product_id], map: "product_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_old_orders {
+    order_id          Int     @id @db.UnsignedMediumInt
+    is_parent_order   String  @default("N") @db.Char(1)
+    parent_order_id   Int     @default(0) @db.UnsignedMediumInt
+    company_id        Int     @default(0) @db.UnsignedInt
+    user_id           Int     @default(0) @db.UnsignedMediumInt
+    total             Decimal @default(0.00) @db.Decimal(12, 2)
+    subtotal          Decimal @default(0.00) @db.Decimal(12, 2)
+    discount          Decimal @default(0.00) @db.Decimal(12, 2)
+    subtotal_discount Decimal @default(0.00) @db.Decimal(12, 2)
+    payment_surcharge Decimal @default(0.00) @db.Decimal(12, 2)
+    shipping_ids      String  @default("") @db.VarChar(255)
+    shipping_cost     Decimal @default(0.00) @db.Decimal(12, 2)
+    timestamp         Int     @default(0) @db.UnsignedInt
+    status            String  @default("O") @db.Char(1)
+    notes             String  @db.Text
+    details           String  @db.Text
+    promotions        String  @db.Text
+    promotion_ids     String  @default("") @db.VarChar(255)
+    title             String  @default("") @db.VarChar(32)
+    firstname         String  @default("") @db.VarChar(32)
+    lastname          String  @default("") @db.VarChar(32)
+    company           String  @default("") @db.VarChar(255)
+    b_title           String  @default("") @db.VarChar(32)
+    b_firstname       String  @default("") @db.VarChar(128)
+    b_lastname        String  @default("") @db.VarChar(128)
+    b_address         String  @default("") @db.VarChar(255)
+    b_address_2       String  @default("") @db.VarChar(255)
+    b_city            String  @default("") @db.VarChar(64)
+    b_county          String  @default("") @db.VarChar(32)
+    b_state           String  @default("") @db.VarChar(32)
+    b_country         String  @default("") @db.Char(2)
+    b_zipcode         String  @default("") @db.VarChar(32)
+    b_phone           String  @default("") @db.VarChar(32)
+    s_title           String  @default("") @db.VarChar(32)
+    s_firstname       String  @default("") @db.VarChar(128)
+    s_lastname        String  @default("") @db.VarChar(128)
+    s_address         String  @default("") @db.VarChar(255)
+    s_address_2       String  @default("") @db.VarChar(255)
+    s_city            String  @default("") @db.VarChar(64)
+    s_county          String  @default("") @db.VarChar(32)
+    s_state           String  @default("") @db.VarChar(32)
+    s_country         String  @default("") @db.Char(2)
+    s_zipcode         String  @default("") @db.VarChar(32)
+    s_phone           String  @default("") @db.VarChar(32)
+    phone             String  @default("") @db.VarChar(32)
+    fax               String  @default("") @db.VarChar(32)
+    url               String  @default("") @db.VarChar(32)
+    email             String  @default("") @db.VarChar(128)
+    payment_id        Int     @default(0) @db.MediumInt
+    tax_exempt        String  @default("N") @db.Char(1)
+    lang_code         String  @default("EN") @db.Char(2)
+    ip_address        String  @default("") @db.VarChar(15)
+    repaid            Int     @default(0)
+    validation_code   String  @default("") @db.VarChar(20)
+    localization_id   Int     @db.MediumInt
+    linkshare         String  @default("N") @db.VarChar(2)
+    awin              String  @default("N") @db.Char(1)
+    afrefunded        String  @default("N") @db.Char(1)
+    timestamp_status  Int     @default(0) @db.UnsignedInt
+    gift              Int     @default(0) @db.UnsignedTinyInt
+
+    @@index([b_country], map: "b_country")
+    @@index([email], map: "email")
+    @@index([parent_order_id], map: "parent_order_id")
+    @@index([promotion_ids], map: "promotion_ids")
+    @@index([shipping_ids], map: "shipping_ids")
+    @@index([status], map: "status")
+    @@index([status, timestamp_status], map: "status_2")
+    @@index([timestamp], map: "timestamp")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_old_profile_fields_data {
+    object_id   Int    @default(0) @db.UnsignedMediumInt
+    object_type String @default("U") @db.Char(1)
+    field_id    Int    @default(0) @db.UnsignedMediumInt
+    value       String @default("0") @db.VarChar(255)
+
+    @@id([object_id, object_type, field_id])
+}
+
+model cscart_order_capture {
+    capture_id Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    order_id   Int     @db.UnsignedMediumInt
+    amount     Decimal @default(0.00) @db.Decimal(12, 2)
+    currency   String  @db.VarChar(3)
+    date       String  @db.VarChar(16)
+    user_id    Int     @db.UnsignedMediumInt
+
+    @@index([capture_id], map: "capture_id")
+    @@index([order_id], map: "order_id")
+}
+
+model cscart_order_currencies {
+    order_id          Int     @id @db.UnsignedMediumInt
+    currency_code     String  @db.VarChar(10)
+    total             Decimal @default(0.00) @db.Decimal(12, 2)
+    subtotal          Decimal @default(0.00) @db.Decimal(12, 2)
+    discount          Decimal @default(0.00) @db.Decimal(12, 2)
+    subtotal_discount Decimal @default(0.00) @db.Decimal(12, 2)
+    payment_surcharge Decimal @default(0.00) @db.Decimal(12, 2)
+    shipping_cost     Decimal @default(0.00) @db.Decimal(12, 2)
+}
+
+model cscart_order_data {
+    order_id Int    @default(0) @db.UnsignedMediumInt
+    type     String @default("") @db.Char(1)
+    data     String @db.Text
+
+    @@id([order_id, type])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_order_detail_barcode {
+    order_id    Int     @default(0) @db.UnsignedMediumInt
+    item_id     Int     @default(0) @db.UnsignedInt
+    product_id  Int     @default(0) @db.UnsignedMediumInt
+    amount      Int     @default(0) @db.UnsignedSmallInt
+    barcode     String  @default("") @db.VarChar(30)
+    system      String  @default("") @db.VarChar(2)
+    shipping    String  @default("") @db.VarChar(10)
+    status      Int     @default(0) @db.UnsignedTinyInt
+    result_text String? @default("") @db.VarChar(100)
+    timestamp   Int     @db.UnsignedInt
+    resend      Int     @default(0) @db.UnsignedTinyInt
+
+    @@id([order_id, item_id])
+    @@index([order_id, status], map: "order_id")
+    @@index([status], map: "status")
+}
+
+model cscart_order_details {
+    item_id      Int     @default(0) @db.UnsignedInt
+    order_id     Int     @default(0) @db.UnsignedMediumInt
+    product_id   Int     @default(0) @db.UnsignedMediumInt
+    product_code String  @default("") @db.VarChar(32)
+    price        Decimal @default(0.00) @db.Decimal(12, 2)
+    price_real   Decimal @default(0.00) @db.Decimal(12, 2)
+    amount       Int     @default(0) @db.UnsignedSmallInt
+    extra        String  @db.Text
+    uk_shipping  String  @default("N") @db.Char(1)
+    us_shipping  String  @default("N") @db.Char(1)
+    sale         Int     @db.UnsignedSmallInt
+
+    @@id([order_id, item_id])
+    @@index([order_id, product_id], map: "o_k")
+    @@index([product_id], map: "product_id")
+}
+
+model cscart_order_docs {
+    doc_id   Int    @default(autoincrement()) @db.UnsignedMediumInt
+    type     String @default("I") @db.Char(1)
+    order_id Int    @db.UnsignedMediumInt
+
+    @@id([doc_id, type])
+    @@index([order_id, type], map: "type")
+}
+
+model cscart_order_followup {
+    order_notes_id Int    @id @default(autoincrement()) @db.UnsignedInt
+    order_id       Int    @db.UnsignedMediumInt
+    user_id        Int    @default(0) @db.UnsignedMediumInt
+    notes          String @db.Text
+    status         Int    @default(0) @db.UnsignedTinyInt
+    timestamp      Int    @default(0) @db.UnsignedInt
+
+    @@index([order_id], map: "order_id")
+    @@index([timestamp], map: "timestamp")
+    @@index([user_id], map: "user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_order_refund {
+    refund_id Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    order_id  Int     @db.UnsignedMediumInt
+    amount    Decimal @default(0.00) @db.Decimal(12, 2)
+    currency  String  @db.VarChar(3)
+    type      Int     @default(0) @db.UnsignedTinyInt
+    date      String  @db.VarChar(16)
+    user_id   Int     @db.UnsignedMediumInt
+
+    @@index([order_id], map: "order_id")
+}
+
+model cscart_order_refund_automatic_log {
+    log_id    Int @id @default(autoincrement()) @db.UnsignedMediumInt
+    return_id Int @db.UnsignedMediumInt
+    order_id  Int @db.UnsignedMediumInt
+    user_id   Int @db.UnsignedMediumInt
+    reason    Int @db.UnsignedTinyInt
+    timestamp Int @db.UnsignedInt
+}
+
+model cscart_order_transactions {
+    payment_id     Int    @default(0) @db.UnsignedMediumInt
+    transaction_id String @default("") @db.VarChar(255)
+    status         String @default("") @db.Char(1)
+    extra          String @db.Text
+
+    @@id([payment_id, transaction_id])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_orders {
+    order_id          Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    is_parent_order   String  @default("N") @db.Char(1)
+    parent_order_id   Int     @default(0) @db.UnsignedMediumInt
+    company_id        Int     @default(0) @db.UnsignedInt
+    user_id           Int     @default(0) @db.UnsignedMediumInt
+    total             Decimal @default(0.00) @db.Decimal(12, 2)
+    subtotal          Decimal @default(0.00) @db.Decimal(12, 2)
+    discount          Decimal @default(0.00) @db.Decimal(12, 2)
+    subtotal_discount Decimal @default(0.00) @db.Decimal(12, 2)
+    payment_surcharge Decimal @default(0.00) @db.Decimal(12, 2)
+    shipping_ids      String  @default("") @db.VarChar(255)
+    shipping_cost     Decimal @default(0.00) @db.Decimal(12, 2)
+    timestamp         Int     @default(0) @db.UnsignedInt
+    status            String  @default("O") @db.Char(1)
+    notes             String  @db.Text
+    details           String  @db.Text
+    promotions        String  @db.Text
+    promotion_ids     String  @default("") @db.VarChar(255)
+    title             String  @default("") @db.VarChar(32)
+    firstname         String  @default("") @db.VarChar(32)
+    lastname          String  @default("") @db.VarChar(32)
+    company           String  @default("") @db.VarChar(255)
+    b_title           String  @default("") @db.VarChar(32)
+    b_firstname       String  @default("") @db.VarChar(128)
+    b_lastname        String  @default("") @db.VarChar(128)
+    b_address         String  @default("") @db.VarChar(255)
+    b_address_2       String  @default("") @db.VarChar(255)
+    b_city            String  @default("") @db.VarChar(64)
+    b_county          String  @default("") @db.VarChar(32)
+    b_state           String  @default("") @db.VarChar(32)
+    b_country         String  @default("") @db.Char(2)
+    b_zipcode         String  @default("") @db.VarChar(32)
+    b_phone           String  @default("") @db.VarChar(32)
+    s_title           String  @default("") @db.VarChar(32)
+    s_firstname       String  @default("") @db.VarChar(128)
+    s_lastname        String  @default("") @db.VarChar(128)
+    s_address         String  @default("") @db.VarChar(255)
+    s_address_2       String  @default("") @db.VarChar(255)
+    s_city            String  @default("") @db.VarChar(64)
+    s_county          String  @default("") @db.VarChar(32)
+    s_state           String  @default("") @db.VarChar(32)
+    s_country         String  @default("") @db.Char(2)
+    s_zipcode         String  @default("") @db.VarChar(32)
+    s_phone           String  @default("") @db.VarChar(32)
+    phone             String  @default("") @db.VarChar(32)
+    fax               String  @default("") @db.VarChar(32)
+    url               String  @default("") @db.VarChar(32)
+    email             String  @default("") @db.VarChar(128)
+    payment_id        Int     @default(0) @db.MediumInt
+    tax_exempt        String  @default("N") @db.Char(1)
+    lang_code         String  @default("EN") @db.Char(2)
+    ip_address        String  @default("") @db.VarChar(15)
+    repaid            Int     @default(0)
+    validation_code   String  @default("") @db.VarChar(20)
+    localization_id   Int     @db.MediumInt
+    linkshare         String  @default("N") @db.VarChar(2)
+    awin              String  @default("N") @db.Char(1)
+    afrefunded        String  @default("N") @db.Char(1)
+    timestamp_status  Int     @default(0) @db.UnsignedInt
+    gift              Int     @default(0) @db.UnsignedTinyInt
+    sale              Int     @db.UnsignedTinyInt
+    packaging         Int     @db.UnsignedTinyInt
+
+    @@index([b_country], map: "b_country")
+    @@index([email], map: "email")
+    @@index([gift], map: "gift")
+    @@index([parent_order_id], map: "parent_order_id")
+    @@index([promotion_ids], map: "promotion_ids")
+    @@index([shipping_ids], map: "shipping_ids")
+    @@index([status, timestamp_status], map: "status")
+    @@index([timestamp], map: "timestamp")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_orders_checkout_logs {
+    id        Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    order_id  Int    @db.UnsignedMediumInt
+    notes     String @db.VarChar(500)
+    timestamp Int    @db.UnsignedInt
+}
+
+model cscart_orders_logs {
+    id          Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    user_id     Int    @default(0) @db.UnsignedMediumInt
+    order_id    Int    @default(0) @db.UnsignedMediumInt
+    status_from String @db.Char(1)
+    status_to   String @db.Char(1)
+    timestamp   Int    @default(0) @db.UnsignedInt
+
+    @@index([order_id], map: "order_id")
+    @@index([status_to], map: "status_to")
+}
+
+model cscart_orders_paf {
+    order_id         Int @id @db.UnsignedMediumInt
+    paf_s_address_id Int @db.UnsignedInt
+    paf_b_address_id Int @db.UnsignedInt
+}
+
+model cscart_packages {
+    packageid Int    @id @default(autoincrement())
+    name      String @default("") @db.VarChar(64)
+    length    Int    @default(0)
+    width     Int    @default(0)
+    height    Int    @default(0)
+}
+
+model cscart_page_descriptions {
+    page_id          Int     @default(0) @db.UnsignedMediumInt
+    lang_code        String  @default("EN") @db.Char(2)
+    page             String? @default("0") @db.VarChar(255)
+    description      String? @db.MediumText
+    meta_keywords    String  @default("") @db.VarChar(255)
+    meta_description String  @default("") @db.VarChar(255)
+    page_title       String  @default("") @db.VarChar(255)
+
+    @@id([page_id, lang_code])
+}
+
+model cscart_pages {
+    page_id              Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    company_id           Int     @default(0) @db.UnsignedInt
+    parent_id            Int     @default(0) @db.UnsignedMediumInt
+    id_path              String  @default("") @db.VarChar(255)
+    status               String  @default("A") @db.Char(1)
+    page_type            String  @default("T") @db.Char(1)
+    position             Int     @default(0) @db.UnsignedSmallInt
+    timestamp            Int     @default(0)
+    usergroup_ids        String  @default("0") @db.VarChar(255)
+    link                 String  @default("") @db.VarChar(255)
+    localization         String  @default("") @db.VarChar(255)
+    new_window           Int     @default(0) @db.TinyInt
+    related_ids          String? @db.Text
+    use_avail_period     String  @default("N") @db.Char(1)
+    avail_from_timestamp Int     @default(0) @db.UnsignedInt
+    avail_till_timestamp Int     @default(0) @db.UnsignedInt
+
+    @@index([localization], map: "localization")
+    @@index([parent_id], map: "parent_id")
+    @@index([status], map: "status")
+}
+
+model cscart_payment_blocked_users {
+    pb_id     Int      @id @default(autoincrement()) @db.UnsignedMediumInt
+    user_id   Int      @db.UnsignedMediumInt
+    email     String?  @db.VarChar(128)
+    notes     String?  @db.Text
+    timestamp DateTime @default(now()) @db.Timestamp(0)
+
+    @@index([email], map: "email")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_payment_descriptions {
+    payment_id   Int    @default(0) @db.UnsignedMediumInt
+    payment      String @default("") @db.VarChar(128)
+    description  String @default("") @db.VarChar(255)
+    instructions String @db.MediumText
+    lang_code    String @default("EN") @db.Char(2)
+
+    @@id([payment_id, lang_code])
+}
+
+model cscart_payment_processors {
+    processor_id       Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    processor          String @default("") @db.VarChar(255)
+    processor_script   String @default("") @db.VarChar(255)
+    processor_template String @default("") @db.VarChar(255)
+    admin_template     String @default("") @db.VarChar(255)
+    callback           String @default("N") @db.Char(1)
+    type               String @default("P") @db.Char(1)
+}
+
+model cscart_payments {
+    payment_id    Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    usergroup_ids String  @default("0") @db.VarChar(255)
+    position      Int     @default(0) @db.UnsignedSmallInt
+    status        String  @default("A") @db.Char(1)
+    template      String  @default("") @db.VarChar(128)
+    processor_id  Int     @default(0) @db.UnsignedMediumInt
+    params        String  @db.Text
+    a_surcharge   Decimal @default(0.000) @db.Decimal(13, 3)
+    p_surcharge   Decimal @default(0.000) @db.Decimal(13, 3)
+    localization  String  @default("") @db.VarChar(255)
+
+    @@index([usergroup_ids, status], map: "c_status")
+    @@index([localization], map: "localization")
+    @@index([position], map: "position")
+}
+
+model cscart_poll_descriptions {
+    object_id   Int    @default(0) @db.UnsignedMediumInt
+    page_id     Int    @default(0) @db.UnsignedMediumInt
+    lang_code   String @default("EN") @db.Char(2)
+    type        String @default("P") @db.Char(1)
+    description String @db.MediumText
+
+    @@id([object_id, lang_code, type])
+    @@index([page_id], map: "page_id")
+}
+
+model cscart_poll_items {
+    item_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    parent_id Int    @default(0) @db.UnsignedMediumInt
+    type      String @default("Q") @db.Char(1)
+    position  Int    @default(0) @db.SmallInt
+    required  String @default("") @db.Char(1)
+    page_id   Int    @default(0) @db.UnsignedMediumInt
+
+    @@index([page_id], map: "page_id")
+    @@index([parent_id], map: "parent_id")
+    @@index([type], map: "type")
+}
+
+model cscart_polls {
+    page_id      Int    @id @default(0) @db.UnsignedMediumInt
+    start_date   Int    @default(0) @db.UnsignedInt
+    end_date     Int    @default(0) @db.UnsignedInt
+    show_results String @default("Y") @db.Char(1)
+}
+
+model cscart_polls_answers {
+    answer_id Int    @default(0) @db.UnsignedMediumInt
+    vote_id   Int    @default(0) @db.UnsignedMediumInt
+    item_id   Int    @default(0) @db.UnsignedMediumInt
+    comment   String @default("") @db.VarChar(255)
+
+    @@id([answer_id, vote_id, item_id])
+}
+
+model cscart_polls_votes {
+    vote_id    Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    page_id    Int    @default(0) @db.UnsignedMediumInt
+    ip_address String @default("") @db.VarChar(15)
+    user_id    Int    @default(0) @db.UnsignedMediumInt
+    time       Int    @default(0)
+    type       String @default("") @db.Char(1)
+}
+
+model cscart_privilege_descriptions {
+    privilege   String @default("") @db.VarChar(32)
+    description String @default("") @db.VarChar(128)
+    lang_code   String @default("EN") @db.Char(2)
+    section_id  Int    @db.MediumInt
+
+    @@id([privilege, lang_code])
+    @@index([section_id], map: "section_id")
+}
+
+model cscart_privilege_section_descriptions {
+    section_id  Int    @db.MediumInt
+    description String @db.VarChar(64)
+    lang_code   String @default("EN") @db.Char(2)
+
+    @@id([section_id, lang_code])
+}
+
+model cscart_privileges {
+    privilege  String @id @default("") @db.VarChar(32)
+    is_default String @default("N") @db.Char(1)
+}
+
+model cscart_product_descriptions {
+    product_id          Int    @default(0) @db.UnsignedMediumInt
+    lang_code           String @default("EN") @db.Char(2)
+    product             String @default("") @db.VarChar(255)
+    shortname           String @default("") @db.VarChar(255)
+    short_description   String @db.MediumText
+    full_description    String @db.MediumText
+    meta_keywords       String @default("") @db.VarChar(255)
+    meta_description    String @default("") @db.VarChar(255)
+    search_words        String @db.Text
+    page_title          String @default("") @db.VarChar(255)
+    age_warning_message String @db.Text
+
+    @@id([product_id, lang_code])
+    @@index([product_id], map: "product_id")
+}
+
+model cscart_product_feature_variant_descriptions {
+    variant_id       Int    @default(0) @db.UnsignedMediumInt
+    variant          String @default("") @db.VarChar(255)
+    description      String @db.MediumText
+    page_title       String @default("") @db.VarChar(255)
+    meta_keywords    String @default("") @db.VarChar(255)
+    meta_description String @default("") @db.VarChar(255)
+    lang_code        String @default("EN") @db.Char(2)
+
+    @@id([variant_id, lang_code])
+}
+
+model cscart_product_feature_variants {
+    variant_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    feature_id Int    @default(0) @db.UnsignedMediumInt
+    url        String @default("") @db.VarChar(255)
+    position   Int    @default(0) @db.UnsignedSmallInt
+
+    @@index([feature_id], map: "feature_id")
+    @@index([position], map: "position")
+}
+
+model cscart_product_features {
+    feature_id         Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    feature_type       String @default("T") @db.Char(1)
+    categories_path    String @db.Text
+    parent_id          Int    @default(0) @db.UnsignedMediumInt
+    display_on_product Int    @default(1) @db.UnsignedTinyInt
+    display_on_catalog Int    @default(1) @db.UnsignedTinyInt
+    status             String @default("A") @db.Char(1)
+    position           Int    @default(0) @db.UnsignedSmallInt
+    comparison         String @default("N") @db.Char(1)
+
+    @@index([status], map: "status")
+}
+
+model cscart_product_features_descriptions {
+    feature_id       Int    @default(0) @db.UnsignedMediumInt
+    description      String @default("") @db.VarChar(255)
+    full_description String @db.MediumText
+    prefix           String @default("") @db.VarChar(128)
+    suffix           String @default("") @db.VarChar(128)
+    lang_code        String @default("EN") @db.Char(2)
+
+    @@id([feature_id, lang_code])
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_product_features_values {
+    feature_id Int    @default(0) @db.UnsignedMediumInt
+    product_id Int    @default(0) @db.UnsignedMediumInt
+    variant_id Int?   @db.UnsignedMediumInt
+    value      String @default("") @db.VarChar(255)
+    value_int  Int?   @db.UnsignedInt
+    lang_code  String @default("EN") @db.Char(2)
+
+    @@index([feature_id, lang_code, variant_id, value, value_int], map: "fl")
+    @@index([feature_id, product_id, lang_code], map: "fpl")
+    @@index([lang_code], map: "lang_code")
+    @@index([product_id], map: "product_id")
+    @@index([variant_id], map: "variant_id")
+    @@ignore
+}
+
+model cscart_product_file_descriptions {
+    file_id   Int    @default(0) @db.UnsignedMediumInt
+    lang_code String @default("EN") @db.Char(2)
+    file_name String @default("") @db.VarChar(255)
+    license   String @db.Text
+    readme    String @db.Text
+
+    @@id([file_id, lang_code])
+}
+
+model cscart_product_file_ekeys {
+    ekey       String @unique(map: "ekey") @default("") @db.VarChar(32)
+    file_id    Int    @default(0) @db.UnsignedMediumInt
+    product_id Int    @default(0) @db.UnsignedMediumInt
+    order_id   Int    @default(0) @db.UnsignedMediumInt
+    downloads  Int    @default(0) @db.UnsignedMediumInt
+    active     String @default("N") @db.Char(1)
+    ttl        Int    @default(0)
+
+    @@id([file_id, order_id])
+    @@index([ttl], map: "ttl")
+}
+
+model cscart_product_files {
+    file_id         Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_id      Int    @default(0) @db.UnsignedMediumInt
+    file_path       String @default("") @db.VarChar(255)
+    preview_path    String @default("") @db.VarChar(255)
+    file_size       Int    @default(0) @db.UnsignedInt
+    preview_size    Int    @default(0) @db.UnsignedInt
+    agreement       String @default("N") @db.Char(1)
+    max_downloads   Int    @default(0) @db.UnsignedSmallInt
+    total_downloads Int    @default(0) @db.UnsignedSmallInt
+    activation_type String @default("M") @db.Char(1)
+    position        Int    @default(0) @db.SmallInt
+    status          String @default("A") @db.Char(1)
+
+    @@index([product_id], map: "product_id")
+}
+
+model cscart_product_filter_descriptions {
+    filter_id Int    @default(0) @db.UnsignedMediumInt
+    lang_code String @default("EN") @db.Char(2)
+    filter    String @default("") @db.VarChar(255)
+
+    @@id([filter_id, lang_code])
+}
+
+model cscart_product_filter_ranges {
+    range_id   Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    feature_id Int     @default(0) @db.UnsignedMediumInt
+    filter_id  Int     @default(0) @db.UnsignedMediumInt
+    from       Decimal @default(0.00) @db.Decimal(12, 2)
+    to         Decimal @default(0.00) @db.Decimal(12, 2)
+    position   Int     @default(0) @db.UnsignedSmallInt
+
+    @@index([feature_id], map: "feature_id")
+    @@index([filter_id], map: "filter_id")
+    @@index([from, to], map: "from")
+}
+
+model cscart_product_filter_ranges_descriptions {
+    range_id   Int    @default(0) @db.UnsignedMediumInt
+    lang_code  String @default("EN") @db.Char(2)
+    range_name String @default("") @db.VarChar(255)
+
+    @@id([range_id, lang_code])
+}
+
+model cscart_product_filters {
+    filter_id         Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    categories_path   String @db.Text
+    feature_id        Int    @default(0) @db.UnsignedMediumInt
+    position          Int    @default(0) @db.UnsignedSmallInt
+    field_type        String @default("") @db.Char(1)
+    show_on_home_page String @default("N") @db.Char(1)
+    status            String @default("A") @db.Char(1)
+
+    @@index([feature_id], map: "feature_id")
+}
+
+model cscart_product_global_option_links {
+    option_id  Int @default(0) @db.UnsignedMediumInt
+    product_id Int @default(0) @db.UnsignedMediumInt
+
+    @@id([option_id, product_id])
+    @@index([product_id], map: "product_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_product_inventory_count {
+    timestamp      Int     @db.UnsignedInt
+    country        String  @db.Char(2)
+    product_id     Int     @db.UnsignedMediumInt
+    variant_id     Int     @db.UnsignedMediumInt
+    product_code   String  @db.VarChar(32)
+    size           String  @db.VarChar(20)
+    stock          Int     @db.MediumInt
+    pending_orders Int     @db.MediumInt
+    total_stock    Int     @db.MediumInt
+    count          Int     @db.MediumInt
+    stock_dif      Int     @db.MediumInt
+    status         Int     @db.UnsignedTinyInt
+    user_id        Int     @db.UnsignedMediumInt
+    note           String? @db.VarChar(500)
+
+    @@id([timestamp, country, product_id, variant_id])
+    @@index([country, product_id, status], map: "country")
+}
+
+model cscart_product_option_variants {
+    variant_id           Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    option_id            Int     @default(0) @db.UnsignedMediumInt
+    position             Int     @default(0) @db.UnsignedSmallInt
+    modifier             Decimal @default(0.000) @db.Decimal(13, 3)
+    modifier_type        String  @default("A") @db.Char(1)
+    weight_modifier      Decimal @default(0.000) @db.Decimal(12, 3)
+    weight_modifier_type String  @default("A") @db.Char(1)
+    point_modifier       Decimal @default(0.000) @db.Decimal(12, 3)
+    point_modifier_type  String  @default("A") @db.Char(1)
+    group                String  @db.VarChar(50)
+    status               String  @default("A") @db.Char(1)
+
+    @@index([option_id, status], map: "option_id")
+    @@index([option_id, variant_id], map: "option_id_2")
+    @@index([position], map: "position")
+    @@index([status], map: "status")
+}
+
+model cscart_product_option_variants_descriptions {
+    variant_id   Int    @default(0) @db.UnsignedMediumInt
+    lang_code    String @default("EN") @db.Char(2)
+    variant_name String @default("") @db.VarChar(255)
+
+    @@id([variant_id, lang_code])
+}
+
+model cscart_product_option_variants_tmp {
+    item_id    Int @unique(map: "item_id") @db.UnsignedInt
+    product_id Int @db.UnsignedMediumInt
+    option_id  Int @db.UnsignedMediumInt
+    variant_id Int @db.UnsignedMediumInt
+}
+
+model cscart_product_options {
+    option_id                 Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_id                Int    @default(0) @db.UnsignedMediumInt
+    company_id                Int    @default(0) @db.UnsignedInt
+    option_type               String @default("S") @db.Char(1)
+    inventory                 String @default("Y") @db.Char(1)
+    regexp                    String @default("") @db.VarChar(255)
+    required                  String @default("N") @db.Char(1)
+    multiupload               String @default("N") @db.Char(1)
+    allowed_extensions        String @default("") @db.VarChar(255)
+    max_file_size             Int    @default(0)
+    missing_variants_handling String @default("M") @db.Char(1)
+    status                    String @default("A") @db.Char(1)
+    position                  Int    @default(0) @db.UnsignedSmallInt
+    value                     String @default("") @db.VarChar(255)
+
+    @@index([product_id, status], map: "c_status")
+    @@index([position], map: "position")
+}
+
+model cscart_product_options_descriptions {
+    option_id         Int    @default(0) @db.UnsignedMediumInt
+    lang_code         String @default("EN") @db.Char(2)
+    option_name       String @default("") @db.VarChar(64)
+    option_text       String @default("") @db.VarChar(255)
+    description       String @db.MediumText
+    comment           String @default("") @db.VarChar(255)
+    inner_hint        String @default("") @db.VarChar(255)
+    incorrect_message String @default("") @db.VarChar(255)
+
+    @@id([option_id, lang_code])
+}
+
+model cscart_product_options_exceptions {
+    exception_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_id   Int    @default(0) @db.UnsignedMediumInt
+    combination  String @default("") @db.VarChar(255)
+
+    @@index([product_id], map: "product")
+}
+
+model cscart_product_options_inventory {
+    product_id       Int    @default(0) @db.UnsignedMediumInt
+    product_code     String @default("") @db.VarChar(32)
+    combination_hash Int    @id @default(0) @db.UnsignedInt
+    combination      String @default("") @db.VarChar(255)
+    amount           Int    @default(0) @db.MediumInt
+    temp             String @default("N") @db.Char(1)
+    position         Int    @default(0) @db.UnsignedSmallInt
+    china_barcode    String @default("") @db.VarChar(30)
+
+    @@index([china_barcode], map: "china_barcode")
+    @@index([product_id, combination], map: "pc")
+}
+
+model cscart_product_point_prices {
+    point_price_id Int @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_id     Int @default(0) @db.UnsignedMediumInt
+    point_price    Int @default(0) @db.UnsignedInt
+    lower_limit    Int @default(0) @db.UnsignedSmallInt
+    usergroup_id   Int @default(0) @db.UnsignedMediumInt
+
+    @@unique([lower_limit, usergroup_id, product_id], map: "unique_key")
+    @@index([product_id, lower_limit, usergroup_id], map: "src_k")
+}
+
+model cscart_product_popularity {
+    product_id Int @id @default(0) @db.UnsignedMediumInt
+    viewed     Int @default(0)
+    added      Int @default(0)
+    deleted    Int @default(0)
+    bought     Int @default(0)
+    total      Int @default(0)
+
+    @@index([product_id, total], map: "total")
+}
+
+model cscart_product_preorder {
+    product_id    Int     @id @db.UnsignedMediumInt
+    user_id       Int     @db.UnsignedMediumInt
+    preorder      Boolean
+    delivery_date Int     @db.UnsignedInt
+
+    @@index([preorder, delivery_date], map: "preorder")
+}
+
+model cscart_product_price_currencies {
+    product_id    Int     @default(0) @db.UnsignedMediumInt
+    currency_code String  @db.VarChar(10)
+    price         Decimal @default(0.00) @db.Decimal(12, 2)
+    list_price    Decimal @default(0.00) @db.Decimal(12, 2)
+    no_gbp        Int     @default(0) @db.UnsignedTinyInt
+
+    @@id([product_id, currency_code])
+}
+
+model cscart_product_price_currencies_old_20201105 {
+    product_id    Int     @default(0) @db.UnsignedMediumInt
+    currency_code String  @db.VarChar(10)
+    price         Decimal @default(0.00) @db.Decimal(12, 2)
+    list_price    Decimal @default(0.00) @db.Decimal(12, 2)
+    no_gbp        Int     @default(0) @db.UnsignedTinyInt
+
+    @@id([product_id, currency_code])
+}
+
+model cscart_product_prices {
+    product_id   Int     @default(0) @db.UnsignedMediumInt
+    price        Decimal @default(0.00) @db.Decimal(12, 2)
+    lower_limit  Int     @default(0) @db.UnsignedSmallInt
+    usergroup_id Int     @default(0) @db.UnsignedMediumInt
+
+    @@unique([product_id, usergroup_id, lower_limit], map: "usergroup")
+    @@index([lower_limit], map: "lower_limit")
+    @@index([product_id], map: "product_id")
+    @@index([usergroup_id, product_id], map: "usergroup_id")
+}
+
+model cscart_product_prices_old_20201105 {
+    product_id   Int     @default(0) @db.UnsignedMediumInt
+    price        Decimal @default(0.00) @db.Decimal(12, 2)
+    lower_limit  Int     @default(0) @db.UnsignedSmallInt
+    usergroup_id Int     @default(0) @db.UnsignedMediumInt
+
+    @@unique([product_id, usergroup_id, lower_limit], map: "usergroup")
+    @@index([lower_limit], map: "lower_limit")
+    @@index([product_id], map: "product_id")
+    @@index([usergroup_id, product_id], map: "usergroup_id")
+}
+
+model cscart_product_racks {
+    product_id Int    @id @db.UnsignedMediumInt
+    rack_1     String @db.VarChar(3)
+    rack_2     String @db.Char(1)
+    rack_3     String @db.Char(1)
+
+    @@index([rack_1, rack_2, rack_3], map: "rack_1")
+}
+
+model cscart_product_relations {
+    product_id  Int    @db.UnsignedMediumInt
+    product_id2 Int    @db.UnsignedMediumInt
+    type        String @db.Char(1)
+
+    @@id([product_id, product_id2])
+    @@index([product_id2], map: "product_id2")
+}
+
+model cscart_product_required_products {
+    product_id  Int @default(0) @db.UnsignedMediumInt
+    required_id Int @default(0) @db.UnsignedMediumInt
+
+    @@id([product_id, required_id])
+}
+
+model cscart_product_sales {
+    category_id Int @default(0) @db.UnsignedMediumInt
+    product_id  Int @default(0) @db.UnsignedMediumInt
+    amount      Int @default(0) @db.UnsignedMediumInt
+
+    @@id([category_id, product_id])
+    @@index([product_id, amount], map: "pa")
+}
+
+model cscart_product_subscriptions {
+    subscription_id   Int      @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_id        Int      @default(0) @db.UnsignedMediumInt
+    user_id           Int      @default(0) @db.UnsignedMediumInt
+    email             String   @default("") @db.VarChar(128)
+    user_fullname     String?  @db.VarChar(257)
+    variant_id        Int?     @db.UnsignedMediumInt
+    subscription_time DateTime @default(now()) @db.Timestamp(0)
+    lang_code         String?  @default("EN") @db.Char(2)
+    status            Int
+
+    @@unique([product_id, email, variant_id], map: "pe")
+    @@index([product_id, user_id, email, variant_id], map: "pd")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_product_subscriptions_admin_log {
+    id         Int @id @default(autoincrement()) @db.UnsignedMediumInt
+    object_id  Int @default(0) @db.UnsignedMediumInt
+    variant_id Int @default(0) @db.UnsignedMediumInt
+    user_id    Int @default(0) @db.UnsignedMediumInt
+    type       Int @default(0) @db.UnsignedTinyInt
+    timestamp  Int @default(0) @db.UnsignedInt
+    stock      Int @default(0) @db.MediumInt
+}
+
+model cscart_product_subscriptions_log {
+    id                Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_id        Int    @db.UnsignedMediumInt
+    user_id           Int    @db.UnsignedMediumInt
+    email             String @db.VarChar(255)
+    variant_id        Int    @db.UnsignedMediumInt
+    subscription_time Int    @db.UnsignedInt
+    sent_time         Int    @db.UnsignedInt
+}
+
+model cscart_product_till_price_currencies {
+    product_id    Int     @default(0) @db.UnsignedMediumInt
+    currency_code String  @db.VarChar(10)
+    price         Decimal @default(0.00) @db.Decimal(12, 2)
+    no_gbp        Int     @default(0) @db.UnsignedTinyInt
+
+    @@id([product_id, currency_code])
+}
+
+model cscart_products {
+    product_id           Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_code         String  @default("") @db.VarChar(40)
+    product_type         String  @default("P") @db.Char(1)
+    owner_id             Int     @default(0) @db.UnsignedMediumInt
+    status               String  @default("A") @db.Char(1)
+    company_id           Int     @default(0) @db.UnsignedInt
+    color_relation_id    Int     @db.UnsignedMediumInt
+    list_price           Decimal @default(0.00) @db.Decimal(12, 2)
+    amount               Int     @default(0) @db.MediumInt
+    weight               Decimal @default(0.00) @db.Decimal(12, 2)
+    length               Int     @default(0) @db.UnsignedMediumInt
+    width                Int     @default(0) @db.UnsignedMediumInt
+    height               Int     @default(0) @db.UnsignedMediumInt
+    shipping_freight     Decimal @default(0.00) @db.Decimal(12, 2)
+    low_avail_limit      Int     @default(0) @db.UnsignedMediumInt
+    timestamp            Int     @default(0) @db.UnsignedInt
+    usergroup_ids        String  @default("0") @db.VarChar(255)
+    is_edp               String  @default("N") @db.Char(1)
+    edp_shipping         String  @default("N") @db.Char(1)
+    unlimited_download   String  @default("N") @db.Char(1)
+    tracking             String  @default("B") @db.Char(1)
+    free_shipping        String  @default("N") @db.Char(1)
+    feature_comparison   String  @default("N") @db.Char(1)
+    zero_price_action    String  @default("R") @db.Char(1)
+    is_pbp               String  @default("N") @db.Char(1)
+    is_op                String  @default("N") @db.Char(1)
+    is_oper              String  @default("N") @db.Char(1)
+    is_returnable        String  @default("Y") @db.Char(1)
+    return_period        Int     @default(10) @db.UnsignedInt
+    avail_since          Int     @default(0) @db.UnsignedInt
+    out_of_stock_actions String  @default("N") @db.Char(1)
+    localization         String  @default("") @db.VarChar(255)
+    min_qty              Int     @default(0) @db.SmallInt
+    max_qty              Int     @default(0) @db.SmallInt
+    qty_step             Int     @default(0) @db.SmallInt
+    list_qty_count       Int     @default(0) @db.SmallInt
+    tax_ids              String  @default("") @db.VarChar(255)
+    age_verification     String  @default("N") @db.Char(1)
+    age_limit            Int     @default(0) @db.TinyInt
+    options_type         String  @default("P") @db.Char(1)
+    exceptions_type      String  @default("F") @db.Char(1)
+    details_layout       String  @default("") @db.VarChar(50)
+    shipping_params      String  @default("") @db.VarChar(255)
+    uk_shipping          String  @default("N") @db.Char(1)
+    us_shipping          String  @default("N") @db.Char(1)
+    type_relation        String? @default("P") @db.Char(2)
+    stamp_image          String  @default("") @db.Char(1)
+    china_barcode        String  @default("") @db.VarChar(30)
+    rack_us              String  @default("") @db.VarChar(6)
+    rack_gb              String  @default("") @db.VarChar(6)
+    rack_cn              String  @db.VarChar(6)
+    rack_ph              String  @db.VarChar(6)
+    commodity_code       String  @db.VarChar(20)
+    position             Int     @default(9999) @db.UnsignedSmallInt
+    non_returnable       Int     @default(0) @db.UnsignedTinyInt
+    new_release          String  @default("N") @db.Char(1)
+    activation_date      Int     @default(0) @db.UnsignedInt
+    thumb                Int     @db.UnsignedTinyInt
+
+    @@index([age_verification, age_limit], map: "age_verification")
+    @@index([china_barcode], map: "china_barcode")
+    @@index([product_code], map: "product_code")
+    @@index([status], map: "status")
+}
+
+model cscart_products_20201105 {
+    product_id           Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_code         String  @default("") @db.VarChar(40)
+    product_type         String  @default("P") @db.Char(1)
+    owner_id             Int     @default(0) @db.UnsignedMediumInt
+    status               String  @default("A") @db.Char(1)
+    company_id           Int     @default(0) @db.UnsignedInt
+    color_relation_id    Int     @db.UnsignedMediumInt
+    list_price           Decimal @default(0.00) @db.Decimal(12, 2)
+    amount               Int     @default(0) @db.MediumInt
+    weight               Decimal @default(0.00) @db.Decimal(12, 2)
+    length               Int     @default(0) @db.UnsignedMediumInt
+    width                Int     @default(0) @db.UnsignedMediumInt
+    height               Int     @default(0) @db.UnsignedMediumInt
+    shipping_freight     Decimal @default(0.00) @db.Decimal(12, 2)
+    low_avail_limit      Int     @default(0) @db.UnsignedMediumInt
+    timestamp            Int     @default(0) @db.UnsignedInt
+    usergroup_ids        String  @default("0") @db.VarChar(255)
+    is_edp               String  @default("N") @db.Char(1)
+    edp_shipping         String  @default("N") @db.Char(1)
+    unlimited_download   String  @default("N") @db.Char(1)
+    tracking             String  @default("B") @db.Char(1)
+    free_shipping        String  @default("N") @db.Char(1)
+    feature_comparison   String  @default("N") @db.Char(1)
+    zero_price_action    String  @default("R") @db.Char(1)
+    is_pbp               String  @default("N") @db.Char(1)
+    is_op                String  @default("N") @db.Char(1)
+    is_oper              String  @default("N") @db.Char(1)
+    is_returnable        String  @default("Y") @db.Char(1)
+    return_period        Int     @default(10) @db.UnsignedInt
+    avail_since          Int     @default(0) @db.UnsignedInt
+    out_of_stock_actions String  @default("N") @db.Char(1)
+    localization         String  @default("") @db.VarChar(255)
+    min_qty              Int     @default(0) @db.SmallInt
+    max_qty              Int     @default(0) @db.SmallInt
+    qty_step             Int     @default(0) @db.SmallInt
+    list_qty_count       Int     @default(0) @db.SmallInt
+    tax_ids              String  @default("") @db.VarChar(255)
+    age_verification     String  @default("N") @db.Char(1)
+    age_limit            Int     @default(0) @db.TinyInt
+    options_type         String  @default("P") @db.Char(1)
+    exceptions_type      String  @default("F") @db.Char(1)
+    details_layout       String  @default("") @db.VarChar(50)
+    shipping_params      String  @default("") @db.VarChar(255)
+    uk_shipping          String  @default("N") @db.Char(1)
+    us_shipping          String  @default("N") @db.Char(1)
+    type_relation        String? @default("P") @db.Char(2)
+    stamp_image          String  @default("") @db.Char(1)
+    china_barcode        String  @default("") @db.VarChar(30)
+    rack_us              String  @default("") @db.VarChar(6)
+    rack_gb              String  @default("") @db.VarChar(6)
+    rack_cn              String  @db.VarChar(6)
+    rack_ph              String  @db.VarChar(6)
+    commodity_code       String  @db.VarChar(20)
+    position             Int     @default(9999) @db.UnsignedSmallInt
+    non_returnable       Int     @default(0) @db.UnsignedTinyInt
+    new_release          String  @default("N") @db.Char(1)
+    activation_date      Int     @default(0) @db.UnsignedInt
+    thumb                Int     @db.UnsignedTinyInt
+
+    @@index([age_verification, age_limit], map: "age_verification")
+    @@index([china_barcode], map: "china_barcode")
+    @@index([product_code], map: "product_code")
+    @@index([status], map: "status")
+}
+
+model cscart_products_categories {
+    product_id  Int    @default(0) @db.UnsignedMediumInt
+    category_id Int    @default(0) @db.UnsignedMediumInt
+    link_type   String @default("M") @db.Char(1)
+    position    Int    @default(0) @db.UnsignedSmallInt
+
+    @@id([category_id, product_id])
+    @@index([link_type], map: "link_type")
+    @@index([product_id, link_type], map: "pt")
+}
+
+model cscart_products_categories_old_20201105 {
+    product_id  Int    @default(0) @db.UnsignedMediumInt
+    category_id Int    @default(0) @db.UnsignedMediumInt
+    link_type   String @default("M") @db.Char(1)
+    position    Int    @default(0) @db.UnsignedSmallInt
+
+    @@id([category_id, product_id])
+    @@index([link_type], map: "link_type")
+    @@index([product_id, link_type], map: "pt")
+}
+
+model cscart_products_restock {
+    product_id   Int @db.UnsignedMediumInt
+    variant_id   Int @db.UnsignedMediumInt
+    restock_date Int @db.UnsignedInt
+    not_restock  Int @default(0) @db.UnsignedTinyInt
+
+    @@id([product_id, variant_id])
+    @@index([not_restock], map: "not_restock")
+    @@index([variant_id, restock_date], map: "variant_id")
+}
+
+model cscart_profile_field_descriptions {
+    object_id   Int    @default(0) @db.UnsignedMediumInt
+    description String @default("") @db.VarChar(255)
+    object_type String @default("F") @db.Char(1)
+    lang_code   String @default("EN") @db.Char(2)
+
+    @@id([object_id, object_type, lang_code])
+}
+
+model cscart_profile_field_values {
+    value_id Int @id @default(autoincrement()) @db.UnsignedMediumInt
+    field_id Int @default(0) @db.UnsignedMediumInt
+    position Int @default(0) @db.UnsignedSmallInt
+}
+
+model cscart_profile_fields {
+    field_id          Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    field_name        String  @default("") @db.VarChar(32)
+    profile_show      String? @default("N") @db.Char(1)
+    profile_required  String? @default("N") @db.Char(1)
+    checkout_show     String? @default("N") @db.Char(1)
+    checkout_required String? @default("N") @db.Char(1)
+    partner_show      String? @default("N") @db.Char(1)
+    partner_required  String? @default("N") @db.Char(1)
+    field_type        String  @default("I") @db.Char(1)
+    position          Int     @default(0) @db.UnsignedSmallInt
+    is_default        String? @default("N") @db.Char(1)
+    section           String? @default("C") @db.Char(1)
+    matching_id       Int     @default(0) @db.UnsignedMediumInt
+
+    @@index([checkout_show, field_type], map: "checkout_show")
+    @@index([field_name], map: "field_name")
+    @@index([profile_show, field_type], map: "profile_show")
+}
+
+model cscart_profile_fields_data {
+    object_id   Int    @default(0) @db.UnsignedMediumInt
+    object_type String @default("U") @db.Char(1)
+    field_id    Int    @default(0) @db.UnsignedMediumInt
+    value       String @default("0") @db.VarChar(255)
+
+    @@id([object_id, object_type, field_id])
+}
+
+model cscart_promotion_descriptions {
+    promotion_id         Int    @default(0) @db.UnsignedMediumInt
+    name                 String @default("") @db.VarChar(255)
+    short_description    String @db.Text
+    detailed_description String @db.MediumText
+    lang_code            String @default("EN") @db.Char(2)
+
+    @@id([promotion_id, lang_code])
+}
+
+model cscart_promotion_mail_check {
+    email     String @db.VarChar(128)
+    promotion Int    @db.UnsignedMediumInt
+
+    @@id([email, promotion])
+}
+
+model cscart_promotions {
+    promotion_id          Int                    @id @default(autoincrement()) @db.UnsignedMediumInt
+    company_id            Int                    @default(0) @db.UnsignedInt
+    conditions            String                 @db.Text
+    bonuses               String                 @db.Text
+    to_date               Int                    @default(0) @db.UnsignedInt
+    from_date             Int                    @default(0) @db.UnsignedInt
+    priority              Int                    @default(0) @db.UnsignedMediumInt
+    stop                  String                 @default("N") @db.Char(1)
+    zone                  cscart_promotions_zone @default(catalog)
+    conditions_hash       String                 @db.Text
+    status                String                 @default("A") @db.Char(1)
+    number_of_usages      Int                    @default(0) @db.MediumInt
+    users_conditions_hash String                 @db.Text
+
+    @@index([status, zone], map: "status")
+}
+
+model cscart_quick_menu {
+    menu_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    user_id   Int    @db.UnsignedMediumInt
+    url       String @db.VarChar(255)
+    parent_id Int    @db.UnsignedMediumInt
+    position  Int    @default(0) @db.UnsignedSmallInt
+
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_quick_search {
+    id        String @id @default("") @db.Char(32)
+    item_id   Int    @db.UnsignedMediumInt
+    type      String @db.VarChar(1)
+    lang_code String @default("EN") @db.VarChar(2)
+    text      String @db.Text
+
+    @@index([text(length: 1000)], map: "text")
+}
+
+model cscart_recurring_events {
+    event_id        Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    subscription_id Int    @db.UnsignedMediumInt
+    timestamp       Int    @default(0) @db.UnsignedInt
+    event_type      String @default("C") @db.Char(1)
+}
+
+model cscart_recurring_plans {
+    plan_id               Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    price                 String @db.Text
+    product_ids           String @db.Text
+    period                String @default("A") @db.Char(1)
+    by_period             Int    @db.MediumInt
+    pay_day               Int    @db.MediumInt
+    duration              Int    @db.MediumInt
+    start_price           String @db.Text
+    start_duration        Int    @db.MediumInt
+    start_duration_type   String @default("D") @db.Char(1)
+    allow_change_duration String @default("N") @db.Char(1)
+    allow_unsubscribe     String @default("N") @db.Char(1)
+    allow_free_buy        String @default("N") @db.Char(1)
+    status                String @default("A") @db.Char(1)
+}
+
+model cscart_recurring_subscriptions {
+    subscription_id Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    order_id        Int     @db.UnsignedMediumInt
+    plan_id         Int     @db.UnsignedMediumInt
+    user_id         Int     @db.UnsignedMediumInt
+    firstname       String  @default("") @db.VarChar(32)
+    lastname        String  @default("") @db.VarChar(32)
+    email           String  @default("") @db.VarChar(128)
+    timestamp       Int     @default(0) @db.UnsignedInt
+    last_timestamp  Int     @default(0) @db.UnsignedInt
+    end_timestamp   Int     @default(0) @db.UnsignedInt
+    order_ids       String  @db.Text
+    product_ids     String  @db.Text
+    start_price     Decimal @default(0.00) @db.Decimal(12, 2)
+    price           Decimal @default(0.00) @db.Decimal(12, 2)
+    duration        Int     @db.MediumInt
+    orig_duration   Int     @db.MediumInt
+    status          String  @default("A") @db.Char(1)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_refer_checks {
+    user_id   Int
+    email     String  @db.VarChar(255)
+    full_name String  @db.VarChar(256)
+    b_address String  @db.VarChar(353)
+    s_address String  @db.VarChar(353)
+    card      String? @db.VarChar(109)
+
+    @@index([b_address(length: 333)], map: "b_address")
+    @@index([card], map: "card")
+    @@index([email], map: "email")
+    @@index([s_address(length: 333)], map: "s_address")
+    @@index([user_id, email], map: "user_id")
+    @@ignore
+}
+
+model cscart_refer_hashes {
+    userid      Int    @unique(map: "userid") @db.MediumInt
+    hash        String @unique(map: "hash") @db.Char(32)
+    fb_shares   Int
+    twits       Int
+    emails_sent Int
+    currency    String @db.VarChar(5)
+}
+
+model cscart_refers {
+    referral_id         Int      @db.MediumInt
+    referred_id         Int      @id @db.MediumInt
+    timestamp           DateTime @default(now()) @db.Timestamp(0)
+    referred_state      Boolean
+    referred_order_id   Int
+    referral_state      Boolean
+    referral_order_id   Int
+    referral_activation DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.Timestamp(0)
+
+    @@index([referral_id], map: "referral")
+    @@index([referred_state, referral_state, referral_activation], map: "referred_state")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_refertokrissie {
+    order_id    Int    @id @db.UnsignedMediumInt
+    notes       String @db.VarChar(5000)
+    status      String @db.VarChar(2)
+    email       String @db.VarChar(128)
+    date_create Int    @db.UnsignedInt
+    date_edit   Int    @db.UnsignedInt
+    user_create Int    @db.UnsignedMediumInt
+    user_edit   Int    @db.UnsignedMediumInt
+}
+
+model cscart_return_uploads {
+    id          Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    returned_to String @db.VarChar(2)
+    img         String @db.VarChar(255)
+    order_id    Int    @db.UnsignedMediumInt
+    return_id   Int    @db.UnsignedMediumInt
+
+    @@index([return_id, returned_to], map: "common")
+}
+
+model cscart_reward_point_changes {
+    change_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    user_id   Int    @default(0) @db.UnsignedMediumInt
+    amount    Int    @default(0)
+    timestamp Int    @default(0) @db.UnsignedInt
+    action    String @default("A") @db.Char(1)
+    reason    String @db.Text
+}
+
+model cscart_reward_points {
+    reward_point_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    object_id       Int    @default(0) @db.UnsignedMediumInt
+    usergroup_id    Int    @default(0) @db.UnsignedMediumInt
+    amount          Int    @default(0) @db.UnsignedInt
+    amount_type     String @default("A") @db.Char(1)
+    object_type     String @default("P") @db.Char(1)
+
+    @@unique([object_id, usergroup_id, object_type], map: "unique_key")
+}
+
+model cscart_rma_properties {
+    property_id                 Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    position                    Int    @default(0) @db.UnsignedSmallInt
+    status                      String @default("") @db.Char(1)
+    type                        String @default("R") @db.Char(1)
+    update_totals_and_inventory String @default("N") @db.Char(1)
+
+    @@index([property_id, status], map: "c_status")
+    @@index([status, type], map: "status")
+}
+
+model cscart_rma_property_descriptions {
+    property_id Int    @default(0) @db.UnsignedMediumInt
+    lang_code   String @default("EN") @db.Char(2)
+    property    String @default("") @db.VarChar(255)
+
+    @@id([property_id, lang_code])
+}
+
+model cscart_rma_return_products {
+    return_id       Int     @default(0) @db.UnsignedMediumInt
+    item_id         Int     @default(0) @db.UnsignedInt
+    product_id      Int     @default(0) @db.UnsignedMediumInt
+    reason          Int     @default(0) @db.UnsignedMediumInt
+    amount          Int     @default(0) @db.UnsignedMediumInt
+    type            String  @default("A") @db.Char(1)
+    price           Decimal @default(0.00) @db.Decimal(12, 2)
+    product_options String? @db.Text
+    product         String  @default("") @db.VarChar(255)
+
+    @@id([return_id, item_id, type])
+    @@index([reason], map: "reason")
+}
+
+model cscart_rma_returns {
+    return_id    Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    order_id     Int     @default(0) @db.UnsignedMediumInt
+    user_id      Int     @default(0) @db.UnsignedMediumInt
+    timestamp    Int     @default(0) @db.UnsignedInt
+    action       Int     @default(0) @db.UnsignedMediumInt
+    status       String  @default("O") @db.Char(1)
+    total_amount Int     @default(0) @db.UnsignedMediumInt
+    comment      String? @db.Text
+    extra        String? @db.Text
+
+    @@index([order_id], map: "order_id")
+    @@index([status], map: "status")
+    @@index([timestamp], map: "timestamp")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_sales_reports {
+    report_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    position  Int    @default(0) @db.UnsignedSmallInt
+    name      String @default("") @db.VarChar(255)
+    status    String @default("A") @db.Char(1)
+    type      String @default("") @db.Char(1)
+    period    String @default("A") @db.Char(2)
+    time_from Int    @default(0)
+    time_to   Int    @default(0)
+}
+
+model cscart_sales_reports_descriptions {
+    report_id   Int    @default(0) @db.UnsignedMediumInt
+    description String @default("") @db.VarChar(255)
+    lang_code   String @default("EN") @db.Char(2)
+
+    @@id([report_id, lang_code])
+}
+
+model cscart_sales_reports_elements {
+    element_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    code         String @default("") @db.VarChar(66)
+    type         String @default("O") @db.Char(1)
+    depend_on_it String @default("N") @db.Char(1)
+}
+
+model cscart_sales_reports_intervals {
+    interval_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    value         Int    @default(0) @db.UnsignedInt
+    interval_code String @default("") @db.VarChar(64)
+}
+
+model cscart_sales_reports_table_conditions {
+    table_id       Int    @default(0) @db.UnsignedMediumInt
+    code           String @default("0") @db.VarChar(64)
+    sub_element_id String @default("0") @db.VarChar(16)
+
+    @@id([table_id, code, sub_element_id])
+}
+
+model cscart_sales_reports_table_descriptions {
+    table_id    Int    @default(0) @db.UnsignedMediumInt
+    description String @default("") @db.VarChar(255)
+    lang_code   String @default("EN") @db.Char(2)
+
+    @@id([table_id, lang_code])
+}
+
+model cscart_sales_reports_table_element_conditions {
+    table_id     Int    @default(0) @db.UnsignedMediumInt
+    element_hash String @default("") @db.VarChar(32)
+    element_code String @default("") @db.VarChar(64)
+    ids          String @default("") @db.VarChar(16)
+
+    @@id([table_id, element_hash, ids])
+}
+
+model cscart_sales_reports_table_elements {
+    report_id    Int    @default(0) @db.UnsignedMediumInt
+    table_id     Int    @default(0) @db.UnsignedMediumInt
+    element_id   Int    @default(0) @db.UnsignedMediumInt
+    element_hash Int    @default(0)
+    color        String @default("blueviolet") @db.VarChar(64)
+    position     Int    @default(0) @db.UnsignedSmallInt
+    status       String @default("A") @db.Char(1)
+    dependence   String @default("max_p") @db.VarChar(64)
+    limit_auto   Int    @default(5) @db.UnsignedMediumInt
+
+    @@id([report_id, table_id, element_hash])
+    @@index([table_id], map: "table_id")
+}
+
+model cscart_sales_reports_tables {
+    table_id    Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    report_id   Int    @default(0) @db.UnsignedMediumInt
+    position    Int    @default(0) @db.UnsignedSmallInt
+    type        String @default("T") @db.Char(1)
+    display     String @default("order_amount") @db.VarChar(64)
+    interval_id Int    @default(0) @db.UnsignedMediumInt
+    auto        String @default("Y") @db.Char(1)
+}
+
+model cscart_seo_names {
+    name      String @default("") @db.VarChar(250)
+    object_id Int    @default(0) @db.UnsignedMediumInt
+    type      String @default("") @db.Char(1)
+    dispatch  String @default("") @db.VarChar(64)
+    lang_code String @default("EN") @db.Char(2)
+
+    @@id([object_id, type, dispatch, lang_code])
+    @@index([dispatch], map: "dispatch")
+    @@index([name, lang_code], map: "name")
+    @@index([name, type, lang_code], map: "type")
+    @@index([type, lang_code], map: "type_2")
+}
+
+model cscart_sessions {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_sessions_0 {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_sessions_1 {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_sessions_2 {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_sessions_3 {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_sessions_4 {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_sessions_5 {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_sessions_6 {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_sessions_7 {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_sessions_8 {
+    session_id String  @default("") @db.VarChar(32)
+    expiry     Int     @default(0) @db.UnsignedInt
+    data       String? @db.MediumText
+    area       String  @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+    @@index([session_id, expiry], map: "src")
+}
+
+model cscart_settings {
+    option_id     Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    option_name   String @default("") @db.VarChar(64)
+    section_id    String @default("") @db.VarChar(64)
+    subsection_id String @default("") @db.VarChar(64)
+    option_type   String @default("I") @db.Char(1)
+    value         String @default("") @db.VarChar(255)
+    position      Int    @default(0) @db.UnsignedSmallInt
+    is_global     String @default("Y") @db.Char(1)
+    edition_type  String @default("ROOT")
+
+    @@index([is_global], map: "is_global")
+    @@index([option_name], map: "option_name")
+    @@index([position], map: "position")
+    @@index([section_id, subsection_id, option_name], map: "section_id")
+}
+
+model cscart_settings_descriptions {
+    object_id        Int    @default(0) @db.UnsignedMediumInt
+    description      String @default("") @db.VarChar(255)
+    object_type      String @default("") @db.Char(1)
+    lang_code        String @default("EN") @db.Char(2)
+    object_string_id String @default("") @db.VarChar(64)
+    tooltip          String @db.Text
+
+    @@id([object_id, object_string_id, lang_code, object_type])
+    @@index([object_id, object_type, lang_code], map: "object_id")
+    @@index([object_string_id, object_type, lang_code], map: "object_string_id")
+}
+
+model cscart_settings_elements {
+    element_id    Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    section_id    String @default("") @db.VarChar(32)
+    subsection_id String @default("") @db.VarChar(32)
+    position      Int    @default(0) @db.UnsignedSmallInt
+    element_type  String @default("") @db.Char(1)
+    handler       String @default("") @db.VarChar(128)
+}
+
+model cscart_settings_sections {
+    section_id String @id @default("") @db.VarChar(32)
+    position   Int    @default(0) @db.UnsignedSmallInt
+}
+
+model cscart_settings_subsections {
+    subsection_id String @default("") @db.VarChar(32)
+    section_id    String @default("") @db.VarChar(32)
+    position      Int    @default(0) @db.UnsignedSmallInt
+
+    @@id([subsection_id, section_id])
+}
+
+model cscart_settings_variants {
+    variant_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    option_id    Int    @default(0) @db.UnsignedMediumInt
+    variant_name String @default("") @db.VarChar(64)
+    position     Int    @default(0) @db.UnsignedSmallInt
+}
+
+model cscart_ship_log {
+    ship_log_id  Int    @id @default(autoincrement())
+    order_id     Int    @default(0)
+    log_date     Int    @default(0)
+    ship_status  String @default("") @db.Char(1)
+    carrier      String @default("") @db.VarChar(10)
+    boxnum       Int    @default(0) @db.UnsignedInt
+    ship_details String @db.Text
+    extras       Bytes
+    shipment_id  Int    @default(0) @db.UnsignedMediumInt
+
+    @@index([order_id, boxnum], map: "orderid_boxnum")
+    @@index([shipment_id], map: "shipment_id")
+}
+
+model cscart_shipment_items {
+    item_id     Int @db.UnsignedInt
+    shipment_id Int @default(0) @db.UnsignedMediumInt
+    order_id    Int @default(0) @db.UnsignedMediumInt
+    product_id  Int @default(0) @db.UnsignedMediumInt
+    amount      Int @default(0) @db.UnsignedInt
+
+    @@id([item_id, shipment_id])
+    @@index([order_id], map: "order_id")
+    @@index([shipment_id], map: "shipment_id")
+}
+
+model cscart_shipments {
+    shipment_id            Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    shipping_id            Int    @default(0) @db.UnsignedMediumInt
+    tracking_number        String @default("") @db.VarChar(255)
+    carrier                String @default("") @db.VarChar(255)
+    timestamp              Int    @default(0) @db.UnsignedInt
+    expected_delivery_date Int    @db.UnsignedInt
+    extra                  String @db.VarChar(255)
+    comments               String @db.MediumText
+    user_id                Int    @db.UnsignedMediumInt
+
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_shipping_descriptions {
+    shipping_id   Int    @default(0) @db.UnsignedMediumInt
+    lang_code     String @default("EN") @db.Char(2)
+    shipping      String @default("") @db.VarChar(255)
+    delivery_time String @default("") @db.VarChar(64)
+
+    @@id([shipping_id, lang_code])
+}
+
+model cscart_shipping_rates {
+    rate_id        Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    shipping_id    Int    @default(0) @db.UnsignedMediumInt
+    destination_id Int    @default(0) @db.UnsignedMediumInt
+    rate_value     String @db.Text
+
+    @@unique([shipping_id, destination_id], map: "shipping_rate")
+}
+
+model cscart_shipping_service_descriptions {
+    service_id  Int    @default(autoincrement()) @db.UnsignedMediumInt
+    description String @default("") @db.VarChar(255)
+    lang_code   String @default("EN") @db.Char(2)
+
+    @@id([service_id, lang_code])
+}
+
+model cscart_shipping_services {
+    service_id        Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    intershipper_code String @default("") @db.Char(3)
+    status            String @default("A") @db.Char(1)
+    carrier           String @default("") @db.VarChar(10)
+    module            String @default("") @db.VarChar(32)
+    code              String @default("") @db.VarChar(64)
+    sp_file           String @default("") @db.VarChar(32)
+
+    @@index([carrier], map: "carrier")
+    @@index([service_id, status], map: "sa")
+}
+
+model cscart_shippings {
+    shipping_id      Int     @unique(map: "shipping_id") @default(autoincrement()) @db.UnsignedMediumInt
+    company_id       Int     @default(0) @db.UnsignedInt
+    destination      String  @default("I") @db.Char(1)
+    min_weight       Decimal @default(0.00) @db.Decimal(12, 2)
+    max_weight       Decimal @default(0.00) @db.Decimal(12, 2)
+    usergroup_ids    String  @default("0") @db.VarChar(255)
+    rate_calculation String  @default("M") @db.Char(1)
+    service_id       Int     @default(0) @db.UnsignedMediumInt
+    localization     String  @default("") @db.VarChar(255)
+    tax_ids          String  @default("") @db.VarChar(255)
+    position         Int     @default(0) @db.UnsignedSmallInt
+    status           String  @default("D") @db.Char(1)
+    params           String  @db.Text
+    estimated_days   Int     @default(0) @db.UnsignedTinyInt
+
+    @@index([usergroup_ids, min_weight, max_weight, status], map: "c_status")
+    @@index([localization], map: "localization")
+    @@index([position], map: "position")
+}
+
+model cscart_sitemap_descriptions {
+    object_id          Int    @default(0) @db.UnsignedMediumInt
+    object_name        String @default("") @db.VarChar(255)
+    object_description String @db.Text
+    object_type        String @default("S") @db.Char(1)
+    lang_code          String @default("EN") @db.Char(2)
+
+    @@id([object_id, lang_code])
+}
+
+model cscart_sitemap_links {
+    link_id    Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    link_href  String @default("") @db.VarChar(255)
+    section_id Int    @default(0) @db.UnsignedMediumInt
+    status     String @default("A") @db.Char(1)
+    position   Int    @default(0) @db.UnsignedSmallInt
+    link_type  String @default("") @db.VarChar(255)
+    company_id Int?   @db.UnsignedInt
+}
+
+model cscart_sitemap_sections {
+    section_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    status       String @default("A") @db.Char(1)
+    section_type String @default("1") @db.VarChar(255)
+    position     Int    @default(0) @db.UnsignedSmallInt
+    company_id   Int?   @db.UnsignedInt
+}
+
+model cscart_splitted_orders {
+    parent_order Int @db.UnsignedMediumInt
+    order_id     Int @db.UnsignedMediumInt
+
+    @@id([parent_order, order_id])
+    @@index([order_id], map: "order_id")
+}
+
+model cscart_splitted_orders_cancelled {
+    parent_order Int @db.UnsignedMediumInt
+    order_id     Int @db.UnsignedMediumInt
+
+    @@id([parent_order, order_id])
+    @@index([order_id], map: "order_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cscart_stat_banners_log {
+    banner_id Int    @default(0) @db.MediumInt
+    type      String @default("C") @db.Char(1)
+    timestamp Int    @default(0)
+
+    @@index([banner_id, type, timestamp], map: "banner_id")
+    @@ignore
+}
+
+model cscart_stat_browsers {
+    browser_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    browser    String @default("") @db.VarChar(50)
+    version    String @default("") @db.VarChar(10)
+}
+
+model cscart_stat_ips {
+    ip_id        Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    ip           Int    @default(0) @db.UnsignedInt
+    country_code String @default("") @db.Char(2)
+    city         String @default("") @db.VarChar(50)
+
+    @@index([country_code], map: "country_code")
+}
+
+model cscart_stat_languages {
+    lang_code String @id @default("") @db.VarChar(5)
+    language  String @default("") @db.VarChar(255)
+}
+
+model cscart_stat_product_search {
+    sess_id       Int    @default(0) @db.UnsignedMediumInt
+    search_string String @db.Text
+    md5           String @default("") @db.VarChar(32)
+    quantity      Int    @default(0) @db.UnsignedMediumInt
+
+    @@id([sess_id, md5])
+}
+
+model cscart_stat_requests {
+    req_id       Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    timestamp    Int    @default(0) @db.UnsignedInt
+    url          String @db.Text
+    title        String @default("") @db.VarChar(255)
+    https        String @default("N") @db.Char(1)
+    loadtime     Int    @default(0) @db.UnsignedInt
+    sess_id      Int    @default(0) @db.UnsignedMediumInt
+    request_type Int    @default(0) @db.UnsignedInt
+
+    @@index([request_type], map: "request_type")
+    @@index([sess_id], map: "sess_id")
+    @@index([timestamp], map: "timestamp")
+}
+
+model cscart_stat_search_engines {
+    engine_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    engine    String @default("") @db.VarChar(128)
+}
+
+model cscart_stat_search_phrases {
+    phrase_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    phrase    String @db.Text
+}
+
+model cscart_stat_sessions {
+    sess_id         Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    os              String @default("") @db.VarChar(30)
+    client_type     String @default("U") @db.Char(1)
+    browser_id      Int    @default(0) @db.UnsignedMediumInt
+    robot           String @default("") @db.VarChar(64)
+    user_agent      String @default("") @db.VarChar(255)
+    screen_x        Int    @default(0) @db.UnsignedSmallInt
+    screen_y        Int    @default(0) @db.UnsignedSmallInt
+    color           Int    @default(0) @db.UnsignedTinyInt
+    client_language String @default("") @db.VarChar(5)
+    session         String @default("") @db.VarChar(32)
+    host_ip         Int    @default(0) @db.UnsignedInt
+    proxy_ip        Int    @default(0) @db.UnsignedInt
+    ip_id           Int    @default(0) @db.UnsignedMediumInt
+    uniq_code       Int    @default(0) @db.UnsignedInt
+    referrer        String @db.Text
+    referrer_scheme String @default("") @db.VarChar(32)
+    referrer_host   String @default("") @db.VarChar(128)
+    engine_id       Int    @default(0) @db.UnsignedMediumInt
+    phrase_id       Int    @default(0) @db.UnsignedMediumInt
+    timestamp       Int    @default(0) @db.UnsignedInt
+    expiry          Int    @default(0) @db.UnsignedInt
+
+    @@index([browser_id], map: "browser_id")
+    @@index([engine_id], map: "engine_id")
+    @@index([ip_id], map: "ip_id")
+    @@index([phrase_id], map: "phrase_id")
+    @@index([robot], map: "robot")
+    @@index([session, expiry], map: "session")
+    @@index([timestamp], map: "timestamp")
+}
+
+model cscart_state_descriptions {
+    state_id  Int    @default(0) @db.UnsignedMediumInt
+    lang_code String @default("EN") @db.VarChar(2)
+    state     String @default("") @db.VarChar(255)
+
+    @@id([state_id, lang_code])
+}
+
+model cscart_states {
+    state_id     Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    country_code String @default("") @db.VarChar(2)
+    code         String @default("") @db.VarChar(32)
+    status       String @default("A") @db.Char(1)
+
+    @@unique([country_code, code], map: "cs")
+    @@index([code], map: "code")
+    @@index([country_code], map: "country_code")
+}
+
+model cscart_static_data {
+    param_id     Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    param        String @default("") @db.VarChar(255)
+    param_2      String @default("") @db.VarChar(255)
+    param_3      String @default("") @db.VarChar(255)
+    param_4      String @default("") @db.VarChar(255)
+    param_5      String @default("") @db.VarChar(255)
+    section      String @default("") @db.Char(1)
+    status       String @default("A") @db.Char(1)
+    position     Int    @default(0) @db.SmallInt
+    parent_id    Int    @default(0) @db.UnsignedMediumInt
+    id_path      String @default("") @db.VarChar(255)
+    localization String @default("") @db.VarChar(255)
+    company_id   Int?   @db.UnsignedInt
+
+    @@index([position], map: "position")
+    @@index([section, status, localization], map: "section")
+}
+
+model cscart_static_data_descriptions {
+    param_id  Int    @default(0) @db.UnsignedMediumInt
+    lang_code String @default("EN") @db.VarChar(2)
+    descr     String @default("") @db.VarChar(255)
+
+    @@id([param_id, lang_code])
+}
+
+model cscart_status_data {
+    status String @default("") @db.Char(1)
+    type   String @default("O") @db.Char(1)
+    param  String @default("") @db.Char(255)
+    value  String @default("Y") @db.Char(255)
+
+    @@id([status, type, param])
+    @@index([value], map: "inventory")
+}
+
+model cscart_status_descriptions {
+    status       String @default("") @db.Char(1)
+    type         String @default("O") @db.Char(1)
+    description  String @default("") @db.VarChar(255)
+    email_subj   String @default("") @db.VarChar(255)
+    email_header String @db.Text
+    lang_code    String @default("EN") @db.Char(2)
+
+    @@id([status, type, lang_code])
+}
+
+model cscart_statuses {
+    status     String @default("") @db.Char(1)
+    type       String @default("O") @db.Char(1)
+    is_default String @default("N") @db.Char(1)
+
+    @@id([status, type])
+}
+
+model cscart_storage_data {
+    key  String @id @default("") @db.VarChar(255)
+    data String @db.Text
+}
+
+model cscart_store_location_descriptions {
+    store_location_id Int    @default(0) @db.UnsignedMediumInt
+    lang_code         String @default("") @db.Char(2)
+    name              String @default("") @db.VarChar(80)
+    description       String @default("") @db.VarChar(255)
+    city              String @default("") @db.VarChar(60)
+
+    @@id([store_location_id, lang_code])
+}
+
+model cscart_store_locations {
+    store_location_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    position          Int    @default(0) @db.SmallInt
+    country           String @default("") @db.Char(2)
+    latitude          Float  @default(0)
+    longitude         Float  @default(0)
+    localization      String @default("") @db.VarChar(255)
+    status            String @default("A") @db.Char(1)
+
+    @@index([status], map: "status")
+}
+
+model cscart_store_locator {
+    id      Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    name    String @db.VarChar(255)
+    address String @db.VarChar(255)
+    lat     Float  @db.Float
+    lng     Float  @db.Float
+}
+
+model cscart_stored_sessions {
+    session_id String @db.VarChar(32)
+    expiry     Int    @db.UnsignedInt
+    data       String @db.Text
+    area       String @default("C") @db.Char(1)
+
+    @@id([session_id, area])
+    @@index([expiry], map: "expiry")
+}
+
+model cscart_subscribers {
+    subscriber_id Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    email         String  @unique(map: "email") @default("") @db.VarChar(128)
+    timestamp     Int     @default(0) @db.UnsignedInt
+    firstname     String? @db.VarChar(127)
+    lastname      String? @db.VarChar(127)
+    birthday      Int?
+    mobile        String? @db.VarChar(30)
+}
+
+model cscart_subscribers_address {
+    subscriber_id Int     @unique(map: "subscriber_id") @db.UnsignedMediumInt
+    address       String? @db.VarChar(255)
+}
+
+model cscart_tag_links {
+    tag_id      Int    @db.UnsignedMediumInt
+    object_type String @default("P") @db.Char(1)
+    object_id   Int    @db.UnsignedMediumInt
+    user_id     Int    @db.UnsignedMediumInt
+
+    @@id([object_type, object_id, user_id, tag_id])
+    @@index([tag_id, user_id, object_type, object_id], map: "ids")
+    @@index([tag_id], map: "tag_id")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_tags {
+    tag_id    Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    tag       String @unique(map: "tag") @default("") @db.VarChar(255)
+    timestamp Int    @default(0) @db.UnsignedInt
+    status    String @default("P") @db.Char(1)
+}
+
+model cscart_tax_descriptions {
+    tax_id    Int    @default(0) @db.UnsignedMediumInt
+    lang_code String @default("EN") @db.Char(2)
+    tax       String @default("") @db.VarChar(255)
+
+    @@id([tax_id, lang_code])
+}
+
+model cscart_tax_rates {
+    rate_id        Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    tax_id         Int     @default(0) @db.UnsignedMediumInt
+    destination_id Int     @default(0) @db.UnsignedMediumInt
+    apply_to       String  @default("") @db.VarChar(64)
+    rate_value     Decimal @default(0.000) @db.Decimal(13, 3)
+    rate_type      String  @default("") @db.Char(1)
+    owner_id       Int     @default(0) @db.UnsignedMediumInt
+
+    @@unique([tax_id, destination_id], map: "tax_rate")
+}
+
+model cscart_taxes {
+    tax_id                Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    address_type          String @default("S") @db.Char(1)
+    status                String @default("D") @db.Char(1)
+    price_includes_tax    String @default("N") @db.Char(1)
+    display_including_tax String @default("N") @db.Char(1)
+    display_info          String @default("") @db.Char(1)
+    regnumber             String @default("") @db.VarChar(255)
+    priority              Int    @default(0) @db.UnsignedMediumInt
+
+    @@index([status], map: "c_status")
+}
+
+model cscart_user_data {
+    user_id Int    @default(0) @db.UnsignedMediumInt
+    type    String @default("") @db.Char(1)
+    data    String @db.Text
+
+    @@id([user_id, type])
+}
+
+model cscart_user_internal_notes {
+    user_id Int
+    email   String  @db.VarChar(128)
+    notes   String? @default("") @db.VarChar(2000)
+
+    @@id([user_id, email])
+}
+
+model cscart_user_mailing_lists {
+    subscriber_id   Int    @db.UnsignedMediumInt
+    list_id         Int    @db.UnsignedMediumInt
+    activation_key  String @default("") @db.VarChar(32)
+    unsubscribe_key String @default("") @db.VarChar(32)
+    confirmed       Int    @default(0) @db.UnsignedTinyInt
+    timestamp       Int    @default(0) @db.UnsignedInt
+    lang_code       String @default("EN") @db.Char(2)
+    format          Int    @default(0) @db.UnsignedTinyInt
+
+    @@unique([list_id, subscriber_id], map: "subscriber_list")
+    @@index([list_id], map: "list_id")
+    @@index([subscriber_id], map: "subscriber_id")
+}
+
+model cscart_user_profiles {
+    profile_id     Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    user_id        Int    @default(0) @db.UnsignedMediumInt
+    profile_type   String @default("P") @db.Char(1)
+    b_title        String @default("") @db.VarChar(32)
+    b_firstname    String @default("") @db.VarChar(128)
+    b_lastname     String @default("") @db.VarChar(128)
+    b_address      String @default("") @db.VarChar(255)
+    b_address_2    String @default("") @db.VarChar(255)
+    b_city         String @default("") @db.VarChar(64)
+    b_county       String @default("") @db.VarChar(32)
+    b_state        String @default("") @db.VarChar(32)
+    b_country      String @default("") @db.Char(2)
+    b_zipcode      String @default("") @db.VarChar(16)
+    b_phone        String @default("") @db.VarChar(32)
+    s_title        String @default("") @db.VarChar(32)
+    s_firstname    String @default("") @db.VarChar(128)
+    s_lastname     String @default("") @db.VarChar(128)
+    s_address      String @default("") @db.VarChar(255)
+    s_address_2    String @default("") @db.VarChar(255)
+    s_city         String @default("") @db.VarChar(255)
+    s_county       String @default("") @db.VarChar(32)
+    s_state        String @default("") @db.VarChar(32)
+    s_country      String @default("") @db.Char(2)
+    s_zipcode      String @default("") @db.VarChar(16)
+    s_phone        String @default("") @db.VarChar(32)
+    s_address_type String @default("") @db.VarChar(255)
+    profile_name   String @default("") @db.VarChar(32)
+    credit_cards   String @db.Text
+
+    @@index([b_country], map: "b_country")
+    @@index([profile_type], map: "profile_type")
+    @@index([user_id, profile_type], map: "uid_p")
+}
+
+model cscart_user_session_products {
+    user_id    Int     @default(0) @db.UnsignedInt
+    timestamp  Int     @default(0) @db.UnsignedInt
+    type       String  @default("C") @db.Char(1)
+    user_type  String  @default("R") @db.Char(1)
+    item_id    Int     @default(0) @db.UnsignedInt
+    item_type  String  @default("P") @db.Char(1)
+    product_id Int     @default(0) @db.UnsignedMediumInt
+    amount     Int     @default(1) @db.UnsignedMediumInt
+    price      Decimal @default(0.00) @db.Decimal(12, 2)
+    extra      String  @db.Text
+    session_id String  @default("") @db.VarChar(32)
+
+    @@id([user_id, type, item_id, user_type])
+    @@index([session_id], map: "session_id")
+    @@index([timestamp, user_type], map: "timestamp")
+}
+
+model cscart_usergroup_descriptions {
+    usergroup_id Int    @default(0) @db.UnsignedMediumInt
+    lang_code    String @default("EN") @db.Char(2)
+    usergroup    String @default("") @db.VarChar(255)
+
+    @@id([usergroup_id, lang_code])
+}
+
+model cscart_usergroup_links {
+    link_id      Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    user_id      Int    @db.UnsignedMediumInt
+    usergroup_id Int    @db.UnsignedMediumInt
+    status       String @default("D") @db.Char(1)
+
+    @@unique([user_id, usergroup_id], map: "user_id")
+}
+
+model cscart_usergroup_privileges {
+    usergroup_id Int    @default(0) @db.UnsignedMediumInt
+    privilege    String @default("") @db.VarChar(32)
+
+    @@id([usergroup_id, privilege])
+}
+
+model cscart_usergroups {
+    usergroup_id        Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    status              String @default("") @db.Char(1)
+    type                String @default("C") @db.Char(1)
+    recurring_plans_ids String @default("") @db.VarChar(255)
+
+    @@index([usergroup_id, status], map: "c_status")
+    @@index([status, type], map: "status")
+}
+
+model cscart_users {
+    user_id                   Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    status                    String  @default("A") @db.Char(1)
+    user_type                 String  @default("C") @db.Char(1)
+    user_login                String  @default("") @db.VarChar(255)
+    referer                   String  @default("") @db.VarChar(255)
+    is_root                   String  @default("N") @db.Char(1)
+    company_id                Int     @default(0) @db.UnsignedInt
+    last_login                Int     @default(0) @db.UnsignedInt
+    timestamp                 Int     @default(0) @db.UnsignedInt
+    password                  String  @default("") @db.VarChar(32)
+    card_name                 String  @default("") @db.VarChar(255)
+    card_type                 String  @default("") @db.VarChar(16)
+    card_number               String  @default("") @db.VarChar(42)
+    card_expire               String  @default("") @db.VarChar(4)
+    card_cvv2                 String  @default("") @db.Char(3)
+    title                     String  @default("") @db.VarChar(24)
+    firstname                 String  @default("") @db.VarChar(128)
+    lastname                  String  @default("") @db.VarChar(128)
+    company                   String  @default("") @db.VarChar(255)
+    email                     String  @default("") @db.VarChar(128)
+    phone                     String  @default("") @db.VarChar(32)
+    fax                       String  @default("") @db.VarChar(32)
+    url                       String  @default("") @db.VarChar(128)
+    tax_exempt                String  @default("N") @db.Char(1)
+    lang_code                 String  @default("EN") @db.Char(2)
+    birthday                  Int
+    purchase_timestamp_from   Int     @default(0)
+    purchase_timestamp_to     Int     @default(0)
+    credit_value              Decimal @default(0.00) @db.Decimal(12, 2)
+    responsible_email         String  @default("") @db.VarChar(80)
+    credit_used               Decimal @default(0.00) @db.Decimal(12, 2)
+    last_passwords            String  @default("") @db.VarChar(255)
+    password_change_timestamp Int     @default(0) @db.UnsignedInt
+    paf_b_address_id          Int     @db.UnsignedInt
+    paf_s_address_id          Int     @db.UnsignedInt
+    is_vip                    Int     @default(0) @db.UnsignedTinyInt
+
+    @@index([company_id, is_root], map: "company_id")
+    @@index([email], map: "email")
+    @@index([title, firstname, lastname], map: "uname")
+    @@index([user_login], map: "user_login")
+}
+
+model cscart_vendor_payouts {
+    payout_id         Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    company_id        Int     @db.UnsignedInt
+    order_id          Int     @default(0) @db.UnsignedMediumInt
+    payout_date       Int     @default(0) @db.UnsignedInt
+    start_date        Int     @default(0) @db.UnsignedInt
+    end_date          Int     @default(0) @db.UnsignedInt
+    payout_amount     Decimal @default(0.00) @db.Decimal(12, 2)
+    order_amount      Decimal @default(0.00) @db.Decimal(12, 2)
+    commission_amount Decimal @default(0.00) @db.Decimal(12, 2)
+    payment_method    String  @default("") @db.VarChar(255)
+    comments          String  @db.Text
+    commission        Decimal @default(0.00) @db.Decimal(12, 2)
+    commission_type   String  @default("A") @db.Char(1)
+
+    @@index([company_id], map: "company_id")
+}
+
+model cscart_views {
+    view_id      Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    object       String @default("") @db.VarChar(24)
+    name         String @default("") @db.VarChar(32)
+    params       String @db.Text
+    view_results String @db.Text
+    user_id      Int    @default(0) @db.UnsignedMediumInt
+    active       String @default("N") @db.Char(1)
+
+    @@index([user_id, object], map: "user_id")
+}
+
+model cscart_vip_users {
+    user_id Int    @id @db.UnsignedMediumInt
+    email   String @db.VarChar(128)
+    country String @db.Char(200)
+    state   String @default("") @db.VarChar(32)
+}
+
+model cscart_vip_users2 {
+    email     String @unique(map: "email") @db.VarChar(255)
+    country   String @db.Char(200)
+    timestamp Int    @default(0) @db.UnsignedInt
+
+    @@index([country], map: "country")
+}
+
+model cscart_z_au_orders_excluded {
+    order_id Int    @id @db.UnsignedMediumInt
+    report   String @db.VarChar(6)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_z_gdpr {
+    id        Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    user_id   Int    @db.UnsignedMediumInt
+    email     String @db.VarChar(128)
+    timestamp Int    @db.UnsignedInt
+    type      String @db.Char(2)
+    is_last   Int    @db.UnsignedTinyInt
+    opt_from  Int    @db.UnsignedSmallInt
+
+    @@index([email, type, is_last], map: "common")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_z_holidays {
+    holiday_id    Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    country_code  String @db.Char(2)
+    datetime      Int    @db.UnsignedInt
+    user_id       Int    @default(0) @db.UnsignedMediumInt
+    timestamp_mod Int    @db.UnsignedInt
+
+    @@unique([country_code, datetime], map: "country_code")
+}
+
+model cscart_z_intransitstock_log {
+    intransit_id Int @id @db.UnsignedMediumInt
+    user_id      Int @db.UnsignedMediumInt
+    timestamp    Int @db.UnsignedInt
+}
+
+model cscart_z_intransitstock_log_detail {
+    id           Int @id @default(autoincrement()) @db.UnsignedMediumInt
+    intransit_id Int @db.UnsignedMediumInt
+    product_id   Int @db.UnsignedMediumInt
+    variant_id   Int @db.UnsignedMediumInt
+    stock_count  Int @db.MediumInt
+}
+
+model cscart_z_order_address_log {
+    log_id         Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    order_id       Int    @db.UnsignedMediumInt
+    user_id        Int    @db.UnsignedMediumInt
+    from_address   String @db.VarChar(255)
+    from_address_2 String @db.VarChar(255)
+    from_city      String @db.VarChar(64)
+    from_state     String @db.VarChar(32)
+    from_country   String @db.VarChar(32)
+    from_zipcode   String @db.VarChar(32)
+    to_address     String @db.VarChar(255)
+    to_address_2   String @db.VarChar(255)
+    to_city        String @db.VarChar(64)
+    to_state       String @db.VarChar(32)
+    to_country     String @db.VarChar(32)
+    to_zipcode     String @db.VarChar(32)
+    timestamp      Int
+
+    @@index([order_id], map: "order_id")
+}
+
+model cscart_z_payment_log {
+    id         Int    @id @default(autoincrement()) @db.UnsignedInt
+    title      String @default("") @db.VarChar(100)
+    payment_id Int    @default(0) @db.UnsignedMediumInt
+    order_id   Int    @default(0) @db.UnsignedMediumInt
+    notes      String @default("") @db.VarChar(2000)
+    timestamp  Int    @default(0) @db.UnsignedInt
+
+    @@index([order_id], map: "order_id")
+}
+
+model cscart_z_returns {
+    return_id            Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    return_us_id         Int     @default(0) @db.UnsignedMediumInt
+    order_date           Int?    @default(0) @db.UnsignedInt
+    user_id              Int?    @default(0) @db.UnsignedMediumInt
+    email                String  @db.VarChar(128)
+    order_id             Int?    @default(0) @db.UnsignedMediumInt
+    item_id              Int     @default(0) @db.UnsignedInt
+    product_id           Int     @default(0) @db.UnsignedMediumInt
+    option_id            Int     @default(0) @db.UnsignedMediumInt
+    variant_id           Int     @default(0) @db.UnsignedMediumInt
+    type                 Boolean @default(false)
+    return_reason        String  @db.VarChar(255)
+    product_condition    Int     @default(0) @db.UnsignedTinyInt
+    ribbon_condition     Int     @default(0) @db.UnsignedTinyInt
+    sale                 Int     @default(0) @db.UnsignedTinyInt
+    exchange_product_id  Int     @default(0) @db.UnsignedMediumInt
+    exchange_option_id   Int     @default(0) @db.UnsignedMediumInt
+    exchange_variant_id  Int     @default(0) @db.UnsignedMediumInt
+    status               Int     @default(0) @db.UnsignedTinyInt
+    sticker              Int     @default(0) @db.UnsignedTinyInt
+    returntocustomer     Int     @default(0) @db.UnsignedTinyInt
+    ebay                 Int     @default(0) @db.UnsignedTinyInt
+    country              String  @db.VarChar(2)
+    non_returnable       Int     @db.UnsignedTinyInt
+    krissie_notes_status Int     @default(0) @db.UnsignedTinyInt
+    return_cost          Decimal @db.Decimal(12, 2)
+    return_cost_currency String  @db.VarChar(3)
+    timestamp            Int     @default(0) @db.UnsignedInt
+    timestamp_status     Int     @db.UnsignedInt
+
+    @@index([country, timestamp], map: "country")
+    @@index([email], map: "email")
+    @@index([order_id], map: "order_id")
+    @@index([product_id, variant_id], map: "product_id")
+    @@index([product_condition, return_cost], map: "return cost report")
+    @@index([status, timestamp], map: "status")
+    @@index([user_id], map: "user_id")
+}
+
+model cscart_z_returns_email_templates {
+    template_id Int      @id @default(autoincrement()) @db.UnsignedSmallInt
+    title       String?  @db.VarChar(100)
+    subject     String?  @db.VarChar(300)
+    template    String?  @db.VarChar(2000)
+    status      Boolean? @default(false)
+}
+
+model cscart_z_returns_notes {
+    return_id      Int    @id @db.UnsignedMediumInt
+    notes_customer String @db.VarChar(2000)
+    notes_admin    String @db.VarChar(2000)
+    notes_exchange String @db.VarChar(2000)
+    notes_country  String @db.VarChar(2000)
+    notes_krissie  String @db.VarChar(2000)
+}
+
+model cscart_z_returns_order_notes {
+    order_id       Int    @id @db.UnsignedMediumInt
+    notes          String @db.VarChar(2000)
+    non_returnable String @db.VarChar(700)
+}
+
+model cscart_z_returns_uploads {
+    id          Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    returned_to String @db.VarChar(2)
+    img         String @db.VarChar(255)
+    order_id    Int    @db.UnsignedMediumInt
+    return_id   Int    @db.UnsignedMediumInt
+
+    @@index([return_id, returned_to], map: "common")
+}
+
+model cscart_z_returns_web2store {
+    return_id          Int    @id @db.UnsignedMediumInt
+    order_id           Int    @db.UnsignedMediumInt
+    store_id           String @db.VarChar(32)
+    extra              String @db.Text
+    exchange_2nd_notes String @db.VarChar(500)
+
+    @@index([order_id], map: "order_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_z_sale {
+    sale_id          Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    title            String  @db.VarChar(255)
+    sale_date        Int     @default(0) @db.UnsignedInt
+    sale_finish_date Int     @default(0) @db.UnsignedInt
+    type             Int     @default(1) @db.UnsignedTinyInt
+    disable_ndd      Int     @default(0) @db.UnsignedTinyInt
+    status           Boolean @default(true)
+    executed         Int     @default(0) @db.UnsignedTinyInt
+}
+
+model cscart_z_sale_products {
+    sale_id        Int     @db.UnsignedMediumInt
+    product_id     Int     @db.UnsignedMediumInt
+    sale_price_gbp Decimal @default(0.00) @db.Decimal(12, 2)
+    sale_price_usd Decimal @default(0.00) @db.Decimal(12, 2)
+    price_gbp      Decimal @default(0.00) @db.Decimal(12, 2)
+    price_usd      Decimal @default(0.00) @db.Decimal(12, 2)
+    previous_price Int     @default(0) @db.UnsignedTinyInt
+    user_id        Int     @default(0) @db.UnsignedMediumInt
+    position       Int     @db.MediumInt
+
+    @@id([sale_id, product_id])
+}
+
+model cscart_z_slides {
+    slide_id   Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    position   Int     @db.UnsignedSmallInt
+    slide_name String? @db.VarChar(255)
+    valid_from Int?    @db.UnsignedInt
+    valid_to   Int?    @db.UnsignedInt
+    created    Int?    @db.UnsignedInt
+    active     Int     @db.UnsignedTinyInt
+    url        String  @db.VarChar(255)
+
+    @@index([valid_from, valid_to, active], map: "dates")
+}
+
+model cscart_z_slides_detail {
+    slide_id   Int    @db.UnsignedMediumInt
+    lang_code  String @db.Char(2)
+    img_mobile String @db.VarChar(255)
+    img_desk   String @db.VarChar(255)
+    img_svg    String @db.VarChar(255)
+
+    @@id([slide_id, lang_code])
+}
+
+model cscart_z_stock {
+    stock_id   Int @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_id Int @default(0) @db.UnsignedMediumInt
+    option_id  Int @default(0) @db.UnsignedMediumInt
+    variant_id Int @default(0) @db.UnsignedMediumInt
+    stock_gb   Int @default(0) @db.MediumInt
+    stock_cn   Int @default(0) @db.MediumInt
+    stock_us   Int @default(0) @db.MediumInt
+    stock_au   Int @default(0) @db.MediumInt
+    stock_ph   Int @db.MediumInt
+
+    @@index([product_id], map: "For not restock report")
+    @@index([product_id, variant_id], map: "common")
+}
+
+model cscart_z_stock_count {
+    country_code     String @id @db.VarChar(2)
+    status_from      String @db.VarChar(2)
+    status_to        String @db.VarChar(2)
+    report_before    String @db.VarChar(255)
+    report_after     String @db.VarChar(255)
+    report_diff      String @db.VarChar(255)
+    status           Int    @db.UnsignedTinyInt
+    timestamp        Int    @db.UnsignedInt
+    timestamp_finish Int    @db.UnsignedInt
+}
+
+model cscart_z_stock_log {
+    id           Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_id   Int     @default(0) @db.UnsignedMediumInt
+    variant_id   Int     @default(0) @db.UnsignedMediumInt
+    user_id      Int     @db.UnsignedMediumInt
+    amount       Int     @default(0) @db.MediumInt
+    country_code String  @db.VarChar(2)
+    notes        String? @db.VarChar(100)
+    timestamp    Int     @db.UnsignedInt
+    is_last      Int     @default(0) @db.UnsignedTinyInt
+
+    @@index([product_id, variant_id, country_code], map: "common")
+}
+
+model cscart_z_store_customers {
+    customer_id Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    email       String @unique(map: "email") @db.VarChar(150)
+    name        String @db.VarChar(255)
+    contact     String @db.VarChar(255)
+    birthday    Int    @db.UnsignedInt
+    timestamp   Int    @db.UnsignedInt
+}
+
+model cscart_z_survey1 {
+    id              Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    email           String @unique(map: "EMAIL") @db.VarChar(255)
+    unique_hash     String @db.VarChar(255)
+    country_code    String @db.VarChar(255)
+    website_rate_1  Int    @db.UnsignedTinyInt
+    delivery_rate_1 Int    @db.UnsignedTinyInt
+    products_rate_1 Int    @db.UnsignedTinyInt
+    products_rate_2 Int    @db.UnsignedTinyInt
+    products_rate_3 Int    @db.UnsignedTinyInt
+    products_rate_4 Int    @db.UnsignedTinyInt
+    service_rate_1  Int    @db.UnsignedTinyInt
+    shop_rate_1     Int    @db.UnsignedTinyInt
+    shop_rate_2     String @db.VarChar(255)
+    shop_rate_3     String @db.VarChar(255)
+    extra           String @db.Text
+    gift_cert_id    Int    @default(0) @db.UnsignedMediumInt
+    group_id        Int    @default(0) @db.UnsignedSmallInt
+    status          Int    @default(0) @db.UnsignedTinyInt
+    sent            Int    @default(0) @db.UnsignedInt
+    timestamp       Int    @db.UnsignedInt
+}
+
+model cscart_z_takeout {
+    takeout_id   Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+    order_id     Int    @db.UnsignedMediumInt
+    item_id      Int    @db.UnsignedInt
+    product_id   Int    @db.UnsignedMediumInt
+    variant_id   Int    @db.UnsignedMediumInt
+    user_id      Int    @db.UnsignedMediumInt
+    country_code String @db.VarChar(2)
+    timestamp    Int    @db.UnsignedInt
+
+    @@unique([order_id, item_id], map: "Unique")
+    @@index([country_code], map: "country_code")
+}
+
+model cscart_z_wishlist_promotion {
+    email     String @id @db.VarChar(255)
+    delivered Int    @db.UnsignedSmallInt
+    products  String @db.VarChar(5000)
+    timestamp Int    @db.UnsignedInt
+}
+
+model cscart_zul_au_reports {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    title     String? @db.VarChar(200)
+    type      String? @db.VarChar(2)
+    uid       Int?    @db.UnsignedMediumInt
+    status    String? @default("1") @db.Char(1)
+    excelfile String? @db.VarChar(500)
+    timestamp Int?    @db.UnsignedInt
+}
+
+model cscart_zul_au_reports_detail {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    pid       Int?    @db.UnsignedInt
+    content   String? @db.LongText
+    status    String? @default("1") @db.Char(1)
+    timestamp Int?    @db.UnsignedInt
+
+    @@index([pid], map: "pid")
+}
+
+model cscart_zul_china_mandy_reports {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    title     String? @db.VarChar(200)
+    type      String? @db.VarChar(2)
+    uid       Int?    @db.UnsignedMediumInt
+    status    String? @default("1") @db.Char(1)
+    excelfile String? @db.VarChar(500)
+    timestamp Int?    @db.UnsignedInt
+
+    @@index([type], map: "type")
+}
+
+model cscart_zul_china_mandy_reports_detail {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    pid       Int?    @db.UnsignedInt
+    content   String? @db.LongText
+    status    String? @default("1") @db.Char(1)
+    timestamp Int?    @db.UnsignedInt
+
+    @@index([pid], map: "pid")
+}
+
+model cscart_zul_china_mandy_reports_old {
+    id        Int     @id @default(autoincrement())
+    title     String? @db.VarChar(200)
+    type      String? @db.VarChar(2)
+    uid       String? @db.VarChar(200)
+    status    String? @default("1") @db.Char(1)
+    timestamp Int?
+}
+
+model cscart_zul_china_stocks_prices {
+    id        Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    product   Int?    @db.UnsignedMediumInt
+    price     String? @db.VarChar(10)
+    status    String? @default("1") @db.Char(1)
+    timestamp Int?    @db.UnsignedInt
+
+    @@index([product, status], map: "product")
+}
+
+model cscart_zul_competition_contestion {
+    id        Int     @id @default(autoincrement())
+    name      String? @db.VarChar(200)
+    email     String? @db.VarChar(100)
+    mobile    String? @db.VarChar(100)
+    address1  String? @db.VarChar(200)
+    address2  String? @db.VarChar(200)
+    dataset   Int?
+    timestamp String? @db.VarChar(100)
+    sample    Int?    @default(0)
+}
+
+model cscart_zul_competition_dataset {
+    dataset_id    Int     @id @default(autoincrement())
+    dataset_name  String? @db.VarChar(100)
+    description   String? @db.VarChar(200)
+    timestamp     String? @db.VarChar(100)
+    mod_timestamp String? @db.VarChar(100)
+    status        String? @default("A") @db.VarChar(10)
+}
+
+model cscart_zul_competition_fieldset {
+    fieldset_id   Int     @id @default(autoincrement())
+    fieldset_name String? @db.VarChar(100)
+    fieldset_css  String? @db.VarChar(100)
+    description   String? @db.VarChar(200)
+    timestamp     String? @db.VarChar(100)
+    status        String? @default("A") @db.VarChar(10)
+}
+
+model cscart_zul_competition_pages {
+    competition_id    Int     @id @default(autoincrement())
+    content_header    String? @db.MediumText
+    content_central_1 String? @db.MediumText
+    content_central_2 String? @db.MediumText
+    content_footer    String? @db.MediumText
+    content_formset   Int?
+    dataset           Int?
+    timestamp         String? @db.VarChar(100)
+    status            String? @default("A") @db.VarChar(10)
+}
+
+model cscart_zul_intransit_stocks {
+    id                  Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    origin              String  @default("CN") @db.Char(2)
+    contena             String? @db.VarChar(255)
+    contena_id          String? @db.VarChar(255)
+    shipping_date       Int?    @db.UnsignedInt
+    estimate_date       Int?    @db.UnsignedInt
+    port_name           String? @db.VarChar(255)
+    method              Int?    @default(1) @db.UnsignedTinyInt
+    view                Int?    @default(1) @db.UnsignedTinyInt
+    status              Int?    @default(1) @db.UnsignedTinyInt
+    status_timestamp    Int     @default(0) @db.UnsignedInt
+    notify_stock_change Int     @db.UnsignedTinyInt
+    uid                 Int?    @db.UnsignedMediumInt
+    notes               String? @db.VarChar(255)
+    destination         String  @default("GB") @db.VarChar(3)
+    stock               Int     @db.UnsignedTinyInt
+    timestamp           Int?    @db.UnsignedInt
+
+    @@index([destination, status], map: "destination")
+    @@index([origin], map: "origin")
+}
+
+model cscart_zul_intransit_stocks_detail {
+    intransit_id     Int    @db.UnsignedMediumInt
+    id               Int    @unique @default(autoincrement()) @db.UnsignedSmallInt
+    product_id       Int    @db.UnsignedMediumInt
+    stock_count      Int    @default(0) @db.UnsignedMediumInt
+    mainsizeoptionid Int    @default(0) @db.UnsignedMediumInt
+    size             String @default("") @db.VarChar(20)
+    variants_id      Int    @default(0) @db.UnsignedMediumInt
+    view             Int    @default(1) @db.UnsignedTinyInt
+    status           Int    @default(1) @db.UnsignedTinyInt
+    timestamp        Int?   @db.UnsignedInt
+
+    @@id([intransit_id, id])
+    @@index([product_id, size, status], map: "product")
+    @@index([view, status], map: "view")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cscart_zul_intransit_stocks_files {
+    id_stock_file Int    @id @default(autoincrement()) @db.UnsignedInt
+    intransit_id  Int    @db.UnsignedMediumInt
+    order_nro     Int    @db.UnsignedInt
+    barcode       String @db.VarChar(30)
+    product_id    Int    @default(0) @db.UnsignedMediumInt
+    variant_id    Int    @default(0) @db.UnsignedMediumInt
+    amount        Int    @db.UnsignedMediumInt
+    status        Int    @db.UnsignedTinyInt
+    description   String @default("") @db.VarChar(200)
+
+    @@index([intransit_id], map: "intransit_id")
+}
+
+model cscart_zul_ph_reports {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    title     String? @db.VarChar(200)
+    type      String? @db.VarChar(2)
+    uid       Int?    @db.UnsignedMediumInt
+    status    String? @default("1") @db.Char(1)
+    excelfile String? @db.VarChar(500)
+    timestamp Int?    @db.UnsignedInt
+}
+
+model cscart_zul_replenish_stock {
+    id               Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    type             String? @db.VarChar(20)
+    action           String? @db.VarChar(20)
+    action_id        Int?    @default(0) @db.UnsignedMediumInt
+    product_id       Int?    @default(0) @db.UnsignedMediumInt
+    product          String  @default("") @db.VarChar(255)
+    size             String? @db.VarChar(255)
+    mainsizeoptionid Int?    @default(0) @db.UnsignedMediumInt
+    variants_id      Int?    @default(0) @db.UnsignedMediumInt
+    user_id          Int?    @default(0) @db.UnsignedMediumInt
+    view             Int?    @default(1) @db.UnsignedTinyInt
+    content          String? @db.VarChar(255)
+    timestamp        Int?    @db.UnsignedInt
+
+    @@index([product], map: "logs")
+}
+
+model cscart_zul_report {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    type      String? @default("2") @db.VarChar(10)
+    subtype   String? @default("2") @db.VarChar(10)
+    title     String? @db.VarChar(200)
+    files     String? @db.LongText
+    uid       Int?    @db.UnsignedMediumInt
+    notes     String? @db.VarChar(400)
+    status    String? @default("1") @db.VarChar(10)
+    timestamp Int?    @db.UnsignedInt
+}
+
+model cscart_zul_stocks_report {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    title     String? @db.VarChar(200)
+    type      String? @default("1") @db.VarChar(10)
+    uid       Int?    @db.UnsignedMediumInt
+    excelfile String? @db.LongText
+    status    String? @default("1") @db.VarChar(10)
+    timestamp Int?    @db.UnsignedInt
+}
+
+model cscart_zul_uk_reports {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    title     String? @db.VarChar(200)
+    type      String? @db.VarChar(2)
+    uid       Int?    @db.UnsignedMediumInt
+    status    String? @default("1") @db.Char(1)
+    excelfile String? @db.VarChar(500)
+    timestamp Int?    @db.UnsignedInt
+}
+
+model cscart_zul_uk_reports_detail {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    pid       Int?    @db.UnsignedInt
+    content   String? @db.LongText
+    status    String? @default("1") @db.Char(1)
+    timestamp Int?    @db.UnsignedInt
+
+    @@index([pid], map: "pid")
+}
+
+model cscart_zul_us_reports {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    title     String? @db.VarChar(200)
+    type      String? @db.VarChar(2)
+    uid       Int?    @db.UnsignedMediumInt
+    status    String? @default("1") @db.Char(1)
+    excelfile String? @db.VarChar(500)
+    timestamp Int?    @db.UnsignedInt
+}
+
+model cscart_zul_us_reports_detail {
+    id        Int     @id @default(autoincrement()) @db.UnsignedInt
+    pid       Int?    @db.UnsignedInt
+    content   String? @db.LongText
+    status    String? @default("1") @db.Char(1)
+    timestamp Int?    @db.UnsignedInt
+
+    @@index([pid], map: "pid")
+}
+
+model desa_draw_points {
+    id_draw   Int      @db.MediumInt
+    id_point  BigInt
+    order_id  Int      @db.MediumInt
+    item_id   Int      @db.UnsignedInt
+    option_id Int      @db.UnsignedMediumInt
+    date_mod  DateTime @db.DateTime(0)
+
+    @@id([id_draw, id_point])
+}
+
+model desa_draw_products {
+    id_draw      Int      @db.MediumInt
+    product_id   Int      @db.MediumInt
+    product_code String?  @db.VarChar(32)
+    option       Int
+    user_id      Int      @db.UnsignedSmallInt
+    date_mod     DateTime @db.DateTime(0)
+
+    @@id([id_draw, product_id])
+}
+
+model desa_draws {
+    id_draw      Int      @id @db.UnsignedMediumInt
+    description  String   @db.VarChar(200)
+    date_from    DateTime @db.DateTime(0)
+    date_to      DateTime @db.DateTime(0)
+    state        String   @db.Char(1)
+    user_id      Int      @db.UnsignedSmallInt
+    date_mod     DateTime @db.DateTime(0)
+    id_point     BigInt?
+    total_orders Int      @db.UnsignedMediumInt
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model desa_photos {
+    id      Int      @id @default(autoincrement()) @db.UnsignedInt
+    name    String   @db.VarChar(200)
+    email   String   @db.VarChar(200)
+    comment String   @db.VarChar(2000)
+    photo   String   @db.VarChar(100)
+    date    DateTime @db.DateTime(0)
+    state   String   @default("P") @db.Char(1)
+    heart   Int      @default(0) @db.UnsignedSmallInt
+
+    @@index([state, date], map: "idx_desaphoto_datestate")
+}
+
+model desa_photos_social_networks {
+    id_photo  Int    @id @default(autoincrement()) @db.UnsignedInt
+    image_id  String @db.VarChar(200)
+    site      String @db.Char(1)
+    src_small String @db.VarChar(500)
+    src_big   String @db.VarChar(500)
+    width     String @db.VarChar(10)
+    height    String @db.VarChar(10)
+    state     String @db.Char(1)
+    date      Int    @db.UnsignedInt
+    heart     Int    @db.SmallInt
+
+    @@unique([image_id, site], map: "image_id")
+    @@index([state], map: "dpsn_state")
+}
+
+model desa_products_photos {
+    id_photo   Int    @id @default(autoincrement()) @db.UnsignedInt
+    product_id Int    @db.UnsignedMediumInt
+    image_id   String @db.VarChar(200)
+    site       String @db.Char(1)
+    src_small  String @db.VarChar(500)
+    src_big    String @db.VarChar(500)
+    width      String @db.VarChar(10)
+    height     String @db.VarChar(10)
+    state      String @db.Char(1)
+    date       Int    @db.UnsignedInt
+
+    @@index([image_id, site], map: "image_id")
+    @@index([product_id, state], map: "product_id")
+}
+
+model desa_products_tags {
+    product_id Int    @id @db.UnsignedMediumInt
+    tag        String @unique(map: "dpt_tag") @db.VarChar(200)
+    date       Int    @db.UnsignedInt
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model desa_testimonials {
+    id      Int      @id @default(autoincrement()) @db.UnsignedInt
+    name    String   @db.VarChar(200)
+    email   String   @db.VarChar(200)
+    message String   @db.VarChar(1000)
+    rating  Decimal  @db.Decimal(1, 0)
+    date    DateTime @db.DateTime(0)
+    state   String   @default("P") @db.Char(1)
+
+    @@index([date, state], map: "idx_desatest_datestate")
+}
+
+model tmp_ajusta_stock {
+    date         DateTime @default(now()) @db.Timestamp(0)
+    product_id   Int      @db.UnsignedMediumInt
+    variant_id   Int      @db.UnsignedMediumInt
+    variant_name String   @db.VarChar(255)
+    uk           Int      @db.MediumInt
+    ch           Int      @db.MediumInt
+    us           Int      @default(0) @db.MediumInt
+    au           Int      @default(0) @db.MediumInt
+    ph           Int      @default(0) @db.MediumInt
+    takeout      Int      @db.MediumInt
+    cscart       Int      @db.MediumInt
+    new          Int      @db.MediumInt
+
+    @@id([date, product_id, variant_id])
+    @@index([product_id], map: "product_id")
+}
+
+model tmp_code_usa {
+    id         Int    @id @default(autoincrement()) @db.UnsignedInt
+    code       String @db.VarChar(20)
+    color      String @db.VarChar(50)
+    location   String @db.VarChar(10)
+    product_id Int    @db.UnsignedMediumInt
+
+    @@index([product_id], map: "product_id")
+}
+
+model tmp_david {
+    order_id   Int     @id @db.UnsignedMediumInt
+    timestamp  Int     @db.UnsignedInt
+    payment_id String  @db.VarChar(10)
+    lastname   String  @db.VarChar(250)
+    firstname  String  @db.VarChar(250)
+    currency   String  @db.Char(3)
+    total      Decimal @db.Decimal(12, 2)
+    status     String  @db.Char(1)
+    refund     String  @db.VarChar(10)
+    p_status   String  @db.VarChar(200)
+    p_refund   Decimal @db.Decimal(12, 2)
+    cancelled  String  @default("") @db.VarChar(100)
+}
+
+model tmp_products {
+    product_id   Int     @db.UnsignedMediumInt
+    size         String  @db.VarChar(255)
+    product_code String? @db.VarChar(32)
+    rack_1       String? @db.VarChar(3)
+    rack_2       String? @db.VarChar(1)
+    rack_3       String? @db.VarChar(1)
+    name         String? @db.VarChar(255)
+    code         String? @db.VarChar(32)
+
+    @@id([product_id, size])
+}
+
+model tmp_sale {
+    id             Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+    product_id     Int     @default(0) @db.UnsignedMediumInt
+    sku            String  @db.VarChar(50)
+    original_price Decimal @db.Decimal(12, 0)
+    sale_price     Decimal @db.Decimal(12, 0)
+
+    @@index([product_id], map: "product_id")
+    @@index([sku], map: "sku")
+}
+
+model tmp_sale_report_bw {
+    product_id      Int    @default(0) @db.UnsignedMediumInt
+    variant_id      Int    @default(0) @db.UnsignedMediumInt
+    product         String @default("") @db.VarChar(255)
+    variant_desc    String @default("") @db.VarChar(255)
+    customer_w      Int    @default(0) @db.UnsignedMediumInt
+    backorder_w     Int    @default(0) @db.UnsignedMediumInt
+    preorder_w      Int    @default(0) @db.UnsignedMediumInt
+    stores_w        Int    @default(0) @db.UnsignedMediumInt
+    total_w         Int    @default(0) @db.UnsignedMediumInt
+    customer_m1     Int    @default(0) @db.UnsignedMediumInt
+    backorder_m1    Int    @default(0) @db.UnsignedMediumInt
+    preorder_m1     Int    @default(0) @db.UnsignedMediumInt
+    stores_m1       Int    @default(0) @db.UnsignedMediumInt
+    total_m1        Int    @default(0) @db.UnsignedMediumInt
+    customer_m2     Int    @default(0) @db.UnsignedMediumInt
+    backorder_m2    Int    @default(0) @db.UnsignedMediumInt
+    preorder_m2     Int    @default(0) @db.UnsignedMediumInt
+    stores_m2       Int    @default(0) @db.UnsignedMediumInt
+    total_m2        Int    @default(0) @db.UnsignedMediumInt
+    stock_cn        Int    @default(0) @db.MediumInt
+    stock_uk        Int    @default(0) @db.MediumInt
+    stock_us        Int    @default(0) @db.MediumInt
+    stock_au        Int    @default(0) @db.MediumInt
+    stock_ph        Int    @default(0) @db.SmallInt
+    pending_takeout Int    @default(0) @db.UnsignedMediumInt
+    intransit_uk    Int    @default(0) @db.UnsignedMediumInt
+    intransit_us    Int    @default(0) @db.UnsignedMediumInt
+    intransit_au    Int    @default(0) @db.UnsignedMediumInt
+    refund          Int    @default(0) @db.UnsignedMediumInt
+    exchanges       Int    @default(0) @db.UnsignedMediumInt
+
+    @@id([product_id, variant_id])
+}
+
+model tmp_sale_report_ptk_bw {
+    product_id      Int @default(0) @db.UnsignedMediumInt
+    variant_id      Int @default(0) @db.UnsignedMediumInt
+    pending_takeout Int @default(0) @db.UnsignedMediumInt
+
+    @@id([product_id, variant_id])
+}
+
+enum cscart_promotions_zone {
+    cart
+    catalog
+}

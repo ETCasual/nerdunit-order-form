@@ -1,4 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
+import { Collapse } from "@/components/Collapse";
 import { Search } from "@/components/Elements/Search";
+import { useForm } from "@/stores/useForm";
+// import type { cscart_products } from "@prisma/client";
 import { useRouter } from "next/router";
 import { useState, type ReactNode } from "react";
 import { GrGroup } from "react-icons/gr";
@@ -31,10 +35,15 @@ export const ProductLayout = ({
   const [filter, setFilter] = useState("all");
   return (
     <div className="flex w-full flex-row">
-      <div className="flex flex-col gap-5 px-5 py-5">
+      <div className="flex min-w-[290px] max-w-[290px] flex-col gap-5 px-5 py-5">
         <div className="flex w-[250px] flex-row items-center justify-between">
           <p className="font-serif font-semibold">Presentations</p>
-          <button className="flex flex-row items-center rounded-md bg-black px-2 py-1 text-white">
+          <button
+            className="flex flex-row items-center rounded-md bg-black px-2 py-1 text-white"
+            onClick={async () =>
+              await fetch("/api/products", { method: "POST" })
+            }
+          >
             <p className="font-interstate text-xs font-bold">New</p>
           </button>
         </div>
@@ -58,7 +67,29 @@ export const ProductLayout = ({
             </div>
           </button>
         </div>
-        <Search placeholder="Presentations" icon={<GrGroup />} />
+        <Search placeholder="Presentations" icon={<GrGroup />} white />
+        {/* <div className="grid grid-cols-2 gap-3 overflow-y-auto">
+          <div className="flex flex-col rounded-md shadow">
+            <img
+              alt="baju"
+              src="https://www.nerdunit.my/cdn/shop/files/EnterTheDragon-Work-Jacket-Black-front_3024x.jpg?v=1706500281"
+            />
+            <div className="flex flex-col rounded-b-md bg-white px-2 py-3">
+              <p className="text-center font-serif text-xs font-bold">
+                Enter The Dragon
+              </p>
+            </div>
+          </div>
+          <div className="rounded-md shadow">
+            <img
+              alt="baju"
+              src="https://www.nerdunit.my/cdn/shop/files/EnterTheDragon-Work-Jacket-Black-front_3024x.jpg?v=1706500281"
+            />
+          </div>
+        </div> */}
+        <div className="flex w-full flex-col">
+          <Collapse title="WINTER 2020 | MYR" />
+        </div>
       </div>
       <div className="w-full bg-white shadow-xl">{children}</div>
     </div>
