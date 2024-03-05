@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Button } from "@/components/Elements/Button";
@@ -25,7 +24,7 @@ const ProductCollectionPage = () => {
     name: "",
     price: 0,
   });
-  const [amt, setAmt] = useState(0);
+  const [amt, setAmt] = useState<number>(0);
 
   // useEffect(() => {
   //   void (async () => {
@@ -47,6 +46,8 @@ const ProductCollectionPage = () => {
 
     void (async () => {
       await fetch(`/api/product?id=${selectedProduct}`, { method: "GET" }).then(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore cant get types from api
         (res) => res.json().then((res) => setProduct(res)),
       );
     })();
@@ -82,7 +83,9 @@ const ProductCollectionPage = () => {
             <div className="flex flex-row items-center justify-between overflow-hidden rounded-md ring-offset-2 hover:ring hover:ring-black">
               <div className="flex flex-row items-center gap-3">
                 <img
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                   src={product.image}
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                   alt={product.name}
                   className="h-[150px] object-cover"
                 />
