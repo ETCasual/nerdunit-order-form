@@ -7,11 +7,11 @@ type CollectionsData = Record<
 >;
 
 export type Product = {
-  id: string;
   image: string;
+  id: string;
   name: string;
-  price: number;
-  currency: string;
+  retailPrice: number;
+  wholesalePrice: number;
 };
 
 export const collectionData: CollectionsData = {
@@ -19,20 +19,20 @@ export const collectionData: CollectionsData = {
     id: 1,
     products: [
       {
-        currency: "USD",
-        id: "NMB1658-30-002 WHITE",
+        id: "NMB1658-30-002_WHITE",
         image:
           "https://d3k2yxl6efztlc.cloudfront.net/presentation/0000925693135597_M.jpg",
         name: `"HOMEY" CORDUROY JORGGER`,
-        price: 39.5,
+        retailPrice: 39.5,
+        wholesalePrice: 40.5,
       },
       {
-        currency: "USD",
-        id: "NMBA525-30-032 DENIM BLUE",
+        id: "NMBA525-30-032_DENIM_BLUE",
         image:
           "https://d3k2yxl6efztlc.cloudfront.net/presentation/00009256898D33A6_M.jpg",
         name: `"EXPOSED" JEANS`,
-        price: 41.5,
+        retailPrice: 41.5,
+        wholesalePrice: 99,
       },
     ],
   },
@@ -40,13 +40,17 @@ export const collectionData: CollectionsData = {
     id: 2,
     products: [
       {
-        currency: "USD",
-        id: "NMB8590-30-001 BLACK",
+        id: "NMB8590-30-001_BLACK",
         image:
           "https://d3k2yxl6efztlc.cloudfront.net/presentation/00009256897E03D7_M.jpg",
         name: `"REFPIPE" PANTS`,
-        price: 117.5,
+        wholesalePrice: 117.5,
+        retailPrice: 15,
       },
     ],
   },
 };
+
+export const products = Object.values(collectionData)
+  .map((cd) => cd.products.map((pro) => pro))
+  .flat();

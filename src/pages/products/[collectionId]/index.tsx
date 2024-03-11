@@ -8,7 +8,7 @@ import { FaRegShareFromSquare } from "react-icons/fa6";
 import { PiFilePdfDuotone } from "react-icons/pi";
 import { FaSliders } from "react-icons/fa6";
 import { Search } from "@/components/Elements/Search";
-import { useForm } from "@/stores/useForm";
+import { useProducts } from "@/stores/useProducts";
 import { useEffect, useState } from "react";
 import { type Product } from "@prisma/client";
 
@@ -18,11 +18,11 @@ import { type Product } from "@prisma/client";
 const ProductCollectionPage = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const [product, setProduct] = useState<Product>({
-    currency: "",
     id: "",
     image: "",
     name: "",
-    price: 0,
+    retail_price: 0,
+    wholesale_price: 0,
   });
   const [amt, setAmt] = useState<number>(0);
 
@@ -37,7 +37,7 @@ const ProductCollectionPage = () => {
   //   })();
   // }, []);
 
-  const { selectedProduct } = useForm();
+  const { selectedProduct } = useProducts();
 
   useEffect(() => {
     if (!selectedProduct) return;
@@ -46,8 +46,7 @@ const ProductCollectionPage = () => {
 
     void (async () => {
       await fetch(`/api/product?id=${selectedProduct}`, { method: "GET" }).then(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore cant get types from api
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         (res) => res.json().then((res) => setProduct(res)),
       );
     })();
@@ -95,7 +94,7 @@ const ProductCollectionPage = () => {
                     {product.id}
                   </p>
                   <p className="pt-5 font-interstate text-sm font-semibold text-gray-500">
-                    {product.price} {product.currency}
+                    {/* {product.price} {product.currency} */}
                   </p>
                 </div>
               </div>
@@ -112,7 +111,7 @@ const ProductCollectionPage = () => {
                   />
                 </div>
                 <div className="font-interstate text-sm font-semibold text-gray-500">
-                  Total: {(amt * product.price).toFixed(2)} {product.currency}
+                  {/* Total: {(amt * product.price).toFixed(2)} {product.currency} */}
                 </div>
               </div>
             </div>

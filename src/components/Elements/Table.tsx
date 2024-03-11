@@ -1,7 +1,10 @@
+import type { Order } from "@prisma/client";
 import { type FunctionComponent } from "react";
+import { Button } from "./Button";
+import { Chip } from "./Chip";
 
 interface TableProps {
-  items: TableItemProps[];
+  items: Partial<Order>[];
 }
 
 export const Table: FunctionComponent<TableProps> = ({ items }) => {
@@ -13,11 +16,18 @@ export const Table: FunctionComponent<TableProps> = ({ items }) => {
           <tr>
             {items.length > 0 &&
               // @ts-expect-error types not defined properly yet.
-              Object.keys(items[0]).map((key, i) => (
-                <th className="px-4 py-3" key={i}>
-                  {key}
-                </th>
-              ))}
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+              Object.keys(items[0]).map((key, i) => {
+                if (key === "formId") return null;
+                return (
+                  <th
+                    className={`px-4 py-3${key !== "name" && key !== "customer" ? " text-center" : ""}`}
+                    key={i}
+                  >
+                    {key}
+                  </th>
+                );
+              })}
           </tr>
         </thead>
         <tbody>
@@ -30,43 +40,32 @@ export const Table: FunctionComponent<TableProps> = ({ items }) => {
   );
 };
 
-export interface TableItemProps {
-  visitor: string;
-  company?: string;
-  code?: string;
-  contact?: string;
-  recentView?: string;
-  visits?: number;
-  order?: string;
-  showroom?: string;
-  rep?: string;
-  lastVisited?: string;
-}
-
-export const TableItem: FunctionComponent<TableItemProps> = ({
-  code = "-",
-  company = "-",
-  contact = "-",
-  lastVisited = "-",
-  order = "-",
-  recentView = "-",
-  rep = "-",
-  showroom = "-",
-  visitor = "-",
-  visits = "-",
+export const TableItem: FunctionComponent<Partial<Order>> = ({
+  id,
+  name,
+  // customer,
+  status,
+  formId,
 }) => {
   return (
-    <tr className="h-[40px_!important]">
-      <td className="px-4 py-2">{visitor}</td>
-      <td className="px-4 py-2">{company}</td>
-      <td className="px-4 py-2">{code}</td>
-      <td className="px-4 py-2">{contact}</td>
-      <td className="px-4 py-2">{recentView}</td>
-      <td className="px-4 py-2">{visits}</td>
-      <td className="px-4 py-2">{order}</td>
-      <td className="px-4 py-2">{showroom}</td>
-      <td className="px-4 py-2">{rep}</td>
-      <td className="px-4 py-2">{lastVisited}</td>
+    <tr className="h-[40px_!important] font-interstate">
+      <td className="max-w-[100px] px-4 py-2 text-sm">{name}</td>
+      {/* <td className="px-4 py-2 text-sm">{customer}</td> */}
+      <td className="px-4 py-2 text-sm">
+        <div className="flex w-full flex-row items-center justify-center text-sm">
+          <Chip label={status as string} color="#FFBBAA" />
+        </div>
+      </td>
+
+      <td className="table-cell w-[125px] py-2">
+        <Button
+          onClick={() => {
+            window.open(`/form/${formId}`);
+          }}
+          label="View Order"
+          dark
+        />
+      </td>
     </tr>
   );
 };

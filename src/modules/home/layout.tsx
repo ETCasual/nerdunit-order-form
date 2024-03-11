@@ -1,3 +1,4 @@
+import { Button } from "@/components/Elements/Button";
 import { NavLayout } from "@/components/Layout/NavLayout";
 import {
   TopNavIcon,
@@ -9,7 +10,7 @@ import { HiOutlineClipboardDocument } from "react-icons/hi2";
 
 const topNavIcons: TopNavIconWithoutBasePath[] = [
   {
-    href: "visitors",
+    href: "dashboard",
     hasNotifications: true,
   },
   {
@@ -43,11 +44,12 @@ export const HomeLayout = ({
         />
       ))}
       rightItems={
-        router.pathname.startsWith("/home/visitors") && (
-          <button className="flex flex-row items-center gap-2 rounded-md bg-black px-3 py-1.5 text-white">
-            <HiOutlineClipboardDocument />
-            <p className="font-interstate text-sm font-bold">New Order</p>
-          </button>
+        router.pathname.startsWith("/home/dashboard") && (
+          <Button
+            label="New Order"
+            dark
+            leftIcon={HiOutlineClipboardDocument}
+          />
         )
       }
     >

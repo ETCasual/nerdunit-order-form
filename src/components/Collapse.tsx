@@ -2,14 +2,14 @@
 import { type FunctionComponent, useState } from "react";
 import { RxTriangleDown } from "react-icons/rx";
 import { collectionData } from "@/data";
-import { useForm } from "@/stores/useForm";
+import { useProducts } from "@/stores/useProducts";
 
 interface CollapseProps {
   title: string;
 }
 
 export const Collapse: FunctionComponent<CollapseProps> = ({ title }) => {
-  const { setProduct } = useForm();
+  const { setProduct } = useProducts();
   const products = collectionData[title]?.products;
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -49,7 +49,7 @@ export const Collapse: FunctionComponent<CollapseProps> = ({ title }) => {
                   {product.name}
                 </p>
                 <div className="px-4 font-interstate font-bold tracking-wider text-gray-400">
-                  {product.currency}
+                  {product.wholesalePrice}
                 </div>
               </div>
             </div>

@@ -6,7 +6,7 @@ import { Table } from "@/components/Elements/Table";
 import { Search } from "@/components/Elements/Search";
 import { FaSliders } from "react-icons/fa6";
 
-const Visitors = () => {
+const Dashboard = () => {
   return (
     <HomeLayout>
       <section className="flex flex-grow flex-col gap-3 px-7 pb-5 pt-3">
@@ -20,9 +20,10 @@ const Visitors = () => {
         <Table
           items={[
             {
-              visitor: "Chin Jia Hao",
-              company: undefined,
-              code: "ET",
+              name: "Order_123",
+              // customer: "WTP",
+              status: "Sent",
+              formId: "asdasd",
             },
           ]}
         />
@@ -31,4 +32,4 @@ const Visitors = () => {
   );
 };
 
-export default Visitors;
+export default Dashboard;

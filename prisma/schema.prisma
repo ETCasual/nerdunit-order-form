@@ -11,28 +11,52 @@ datasource db {
 }
 
 model Product {
-    id         String       @id
-    image      String
-    name       String
-    price      Float
-    currency   String
-    Form_Input Form_Input[]
+    id              String       @id @unique
+    image           String
+    name            String
+    retail_price    Float
+    wholesale_price Float
+    Form_Input      Form_Input[]
 }
 
 model Form_Input {
-    id       String  @id
+    id       String  @id @unique @default(uuid())
     product  Product @relation(fields: [productId], references: [id])
     quantity Int
 
-    productId String
     Form      Form?   @relation(fields: [formId], references: [id])
     formId    String?
+    productId String
 
-    @@index([productId])
     @@index([formId])
+    @@index([productId])
 }
 
 model Form {
-    id         String       @id
+    id         String       @id @unique @default(uuid())
     form_input Form_Input[]
+    order      Order[]
+}
+
+model Order {
+    id     String      @id @unique @default(uuid())
+    name   String
+    // customer String
+    form   Form        @relation(fields: [formId], references: [id])
+    formId String
+    status OrderStatus
+
+    @@index([formId])
+}
+
+enum OrderStatus {
+    Sent
+    Pending_Confirmation
+    Pending_Payment
+    Paid
+    Delivered
+    Complete
+    Cancelled
+    Refunded
+    On_Hold
 }

@@ -26,16 +26,16 @@ const icons: SideBarIconProps[] = [
   //   activeIcon: FaHandshakeSimple,
   //   unactiveIcon: FaRegHandshake,
   // },
-  // {
-  //   href: "/orders",
-  //   activeIcon: HiClipboardDocumentList,
-  //   unactiveIcon: HiOutlineClipboardDocumentList,
-  // },
+  {
+    href: "/orders",
+    activeIcon: HiClipboardDocumentList,
+    unactiveIcon: HiOutlineClipboardDocumentList,
+  },
 ];
 
 export const Layout = ({ children }: { children: ReactNode[] | ReactNode }) => {
   const router = useRouter();
-  return router.asPath !== "/" ? (
+  return router.asPath !== "/" && !router.asPath.startsWith("/form/") ? (
     <main className="relative flex h-screen flex-row justify-center overflow-y-auto bg-[#F1F3F4]">
       <div className="sticky left-0 top-0 z-30 flex h-screen w-[70px] flex-col items-center justify-between bg-white px-2 py-4 shadow-lg">
         <div className="flex flex-col gap-4">

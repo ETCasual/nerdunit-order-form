@@ -15,6 +15,6 @@ const createState: StateCreator<FormState> = (set) => ({
   },
 });
 
-export const useForm = create(
-  persist(createState, { name: "nerdunit-orderform-form" }),
+export const useProducts = create(
+  persist(createState, { name: "nerdunit-orderform-products" }),
 );

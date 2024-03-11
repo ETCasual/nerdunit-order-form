@@ -26,7 +26,7 @@ import { GrGroup } from "react-icons/gr";
 //   },
 // ];
 
-export const ProductLayout = ({
+export const OrdersLayout = ({
   children,
 }: {
   children?: ReactNode | ReactNode[];
@@ -37,7 +37,7 @@ export const ProductLayout = ({
     <div className="flex w-full flex-row">
       <div className="flex min-w-[290px] max-w-[290px] flex-col gap-5 px-5 py-5">
         <div className="flex w-[250px] flex-row items-center justify-between">
-          <p className="font-serif font-semibold">Presentations</p>
+          <p className="font-serif font-semibold">Orders</p>
           <button
             className="flex flex-row items-center rounded-md bg-black px-2 py-1 text-white"
             onClick={async () =>
@@ -67,7 +67,7 @@ export const ProductLayout = ({
             </div>
           </button>
         </div>
-        <Search placeholder="Presentations" icon={<GrGroup />} white />
+        <Search placeholder="Orders" icon={<GrGroup />} white />
         {/* <div className="grid grid-cols-2 gap-3 overflow-y-auto">
           <div className="flex flex-col rounded-md shadow">
             <img
@@ -87,9 +87,7 @@ export const ProductLayout = ({
             />
           </div>
         </div> */}
-        <div className="flex w-full flex-col">
-          <Collapse title="WINTER 2020 | MYR" />
-        </div>
+        <div className="flex w-full flex-col"></div>
       </div>
       <div className="w-full bg-white shadow-xl">{children}</div>
     </div>

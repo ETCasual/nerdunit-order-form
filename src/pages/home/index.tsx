@@ -6,7 +6,7 @@ const HomeIndex = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (router.pathname.endsWith("home")) void router.push("/home/visitors");
+    if (router.pathname.endsWith("home")) void router.push("/home/dashboard");
   }, [router]);
   return <HomeLayout />;
 };

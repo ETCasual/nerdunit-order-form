@@ -12,11 +12,10 @@ const handler: NextApiHandler = async (req, res) => {
     try {
       const products = await db.product.findUnique({
         select: {
-          currency: true,
           id: true,
           image: true,
           name: true,
-          price: true,
+          retail_price: true,
         },
         where: {
           id: id as string,
