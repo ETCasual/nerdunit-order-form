@@ -126,7 +126,9 @@ const OrderPage = () => {
 
               if (res.ok) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                setReturnedOrderId(await res.json().then((id: string) => id));
+                setReturnedOrderId(
+                  await res.json().then((id: { id: string }) => id.id),
+                );
               }
 
               actions.setSubmitting(false);
