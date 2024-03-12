@@ -25,9 +25,7 @@ export type FormikCreateOrderForm = {
 
 const OrderPage = () => {
   const [formInputs, setFormInputs] = useState<FormInputs[]>([]);
-  const [returnedOrderId, setReturnedOrderId] = useState(
-    "0cd6830a-1a61-4829-8cb1-466f1b0a6b77",
-  );
+  const [returnedOrderId, setReturnedOrderId] = useState("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
